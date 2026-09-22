@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Genki Diner — Order</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Noto+Serif+JP:wght@500;700&family=Noto+Sans+JP:wght@400;600&family=Noto+Serif+TC:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+:root{
+  --ink:#1C1B19;
+  --paper:#FBF6EC;
+  --paper-2:#F3ECDC;
+  --chili:#C23B22;
+  --chili-dark:#8F2A18;
+  --soy:#C68A34;
+  --stone:#786F60;
+  --line:#E3DAC4;
+  --white:#FFFFFF;
+  --font-body:'IBM Plex Sans', sans-serif;
+  --font-display:'Fraunces', serif;
+}
+body.lang-ja{
+  --font-body:'Noto Sans JP', sans-serif;
+  --font-display:'Noto Serif JP', serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--font-body);
+  min-height:100vh;
+  padding-bottom:96px;
+}
+.zh{ font-family:'Noto Serif TC', serif; }
+
+/* ---------- header ---------- */
+header{
+  padding:22px 20px 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  border-bottom:1px solid var(--line);
+}
+.brand h1{
+  font-family:var(--font-display);
+  font-size:26px;
+  font-weight:600;
+  margin:0 0 2px;
+  letter-spacing:0.2px;
+}
+.brand p{
+  margin:0;
+  font-size:13px;
+  color:var(--stone);
+}
+.lang-switch{
+  display:flex;
+  border:1px solid var(--ink);
+  border-radius:999px;
+  overflow:hidden;
+  flex-shrink:0;
+}
+.lang-switch button{
+  border:none;
+  background:transparent;
+  padding:7px 14px;
+  font-family:var(--font-body);
+  font-size:13px;
+  font-weight:500;
+  cursor:pointer;
+  color:var(--ink);
+}
+.lang-switch button.active{
+  background:var(--ink);
+  color:var(--paper);
+}
+
+/* ---------- categories ---------- */
+.tabs{
+  display:flex;
+  gap:8px;
+  padding:16px 20px 4px;
+  overflow-x:auto;
+}
+.tabs button{
+  flex-shrink:0;
+  border:1px solid var(--line);
+  background:var(--white);
+  padding:8px 16px;
+  border-radius:999px;
+  font-family:var(--font-body);
+  font-size:13px;
+  color:var(--stone);
+  cursor:pointer;
+}
+.tabs button.active{
+  border-color:var(--chili);
+  color:var(--chili-dark);
+  background:#FBEAE4;
+}
+
+/* ---------- menu grid ---------- */
+.grid{
+  padding:14px 20px 20px;
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+}
+@media(min-width:640px){
+  .grid{grid-template-columns:1fr 1fr;}
+}
+.card{
+  position:relative;
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:4px;
+  padding:16px 16px 14px;
+}
+.stamp{
+  position:absolute;
+  top:12px;
+  right:12px;
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  border:1.5px solid var(--chili);
+  color:var(--chili);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transform:rotate(-8deg);
+  font-size:16px;
+  font-weight:700;
+  opacity:0.85;
+}
+.card-name{
+  font-family:var(--font-display);
+  font-size:19px;
+  font-weight:600;
+  margin:0 68px 4px 0;
+  line-height:1.3;
+}
+.card-ingredients{
+  font-size:12.5px;
+  color:var(--stone);
+  margin:0 68px 10px 0;
+  line-height:1.5;
+}
+.card-price{
+  font-size:14px;
+  color:var(--stone);
+  margin:0 0 14px;
+}
+.card-note{
+  font-size:12px;
+  font-style:italic;
+  color:var(--chili-dark);
+  margin:0 0 10px;
+}
+.qty-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.add-btn{
+  border:1px solid var(--ink);
+  background:var(--ink);
+  color:var(--paper);
+  padding:8px 18px;
+  border-radius:4px;
+  font-family:var(--font-body);
+  font-size:13px;
+  font-weight:500;
+  cursor:pointer;
+}
+.stepper{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  border:1px solid var(--line);
+  border-radius:4px;
+  padding:4px 6px;
+}
+.stepper button{
+  width:24px;
+  height:24px;
+  border:none;
+  background:transparent;
+  font-size:16px;
+  cursor:pointer;
+  color:var(--chili-dark);
+}
+.stepper span{
+  min-width:14px;
+  text-align:center;
+  font-size:14px;
+  font-weight:600;
+}
+
+/* ---------- floating cart bar ---------- */
+.cartbar{
+  position:fixed;
+  left:0; right:0; bottom:0;
+  background:var(--ink);
+  color:var(--paper);
+  padding:14px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  transform:translateY(110%);
+  transition:transform 0.25s ease;
+  z-index:40;
+}
+.cartbar.show{ transform:translateY(0); }
+.cartbar .info{ font-size:13px; color:#CFC7B4; }
+.cartbar .total{
+  font-family:var(--font-display);
+  font-size:18px;
+  color:var(--paper);
+  margin-top:2px;
+}
+.cartbar button{
+  background:var(--chili);
+  color:var(--white);
+  border:none;
+  padding:11px 20px;
+  border-radius:4px;
+  font-family:var(--font-body);
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+/* ---------- overlay + review sheet ---------- */
+.overlay{
+  position:fixed; inset:0;
+  background:rgba(20,18,15,0.55);
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  z-index:50;
+}
+.overlay.show{ display:flex; }
+.sheet{
+  background:var(--paper);
+  width:100%;
+  max-width:480px;
+  max-height:82vh;
+  overflow-y:auto;
+  border-radius:12px 12px 0 0;
+  padding:20px 20px 24px;
+}
+.sheet h2{
+  font-family:var(--font-display);
+  font-size:20px;
+  margin:0 0 14px;
+}
+.line-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 0;
+  border-bottom:1px solid var(--line);
+  gap:10px;
+}
+.line-item .name{ font-size:14px; font-weight:500; flex:1; }
+.line-item .remove{
+  border:none; background:none; color:var(--stone);
+  font-size:12px; text-decoration:underline; cursor:pointer;
+  padding:4px;
+}
+.line-item-block{
+  padding:10px 0;
+  border-bottom:1px solid var(--line);
+}
+.line-item-block .line-item{ padding:0 0 8px; border:none; }
+.note-input{
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:4px;
+  padding:8px 10px;
+  font-family:var(--font-body);
+  font-size:13px;
+  background:var(--paper-2);
+  color:var(--ink);
+}
+.note-input::placeholder{ color:#A79E8C; }
+
+/* ---------- modifier options ---------- */
+.opt-group{ margin-bottom:18px; }
+.opt-group-label{
+  font-size:13px;
+  font-weight:600;
+  margin-bottom:2px;
+}
+.opt-group-required{
+  font-size:11px;
+  color:var(--chili-dark);
+  margin-bottom:8px;
+}
+.opt-choice{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 0;
+  border-bottom:1px solid var(--line);
+  font-size:14px;
+  cursor:pointer;
+}
+.opt-choice input{ accent-color:var(--chili); width:16px; height:16px; flex-shrink:0; }
+.opt-choice .opt-name{ flex:1; }
+.opt-choice .opt-price{ color:var(--stone); font-size:12.5px; }
+.opt-sub{
+  margin:10px 0 4px 26px;
+  padding:10px 12px;
+  background:var(--paper-2);
+  border-radius:6px;
+}
+.opt-sub .opt-group-label{ font-size:12px; }
+.opt-sub .opt-choice{ padding:6px 0; border-bottom:none; font-size:13px; }
+.mod-qty-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:14px;
+  gap:12px;
+}
+.mod-add-btn{
+  flex:1;
+  background:var(--chili);
+  color:var(--white);
+  border:none;
+  padding:13px;
+  border-radius:6px;
+  font-family:var(--font-body);
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+}
+.mod-add-btn:disabled{
+  background:var(--line);
+  color:var(--stone);
+  cursor:not-allowed;
+}
+.select-opts-btn{
+  border:1px solid var(--ink);
+  background:var(--ink);
+  color:var(--paper);
+  padding:8px 16px;
+  border-radius:4px;
+  font-family:var(--font-body);
+  font-size:12.5px;
+  font-weight:500;
+  cursor:pointer;
+}
+.sheet-total{
+  display:flex;
+  justify-content:space-between;
+  padding:16px 0 6px;
+  font-family:var(--font-display);
+  font-size:17px;
+}
+.confirm-btn{
+  width:100%;
+  margin-top:12px;
+  background:var(--chili);
+  color:var(--white);
+  border:none;
+  padding:14px;
+  border-radius:6px;
+  font-family:var(--font-body);
+  font-size:15px;
+  font-weight:600;
+  cursor:pointer;
+}
+.close-link{
+  display:block;
+  text-align:center;
+  margin-top:10px;
+  color:var(--stone);
+  font-size:13px;
+  background:none;
+  border:none;
+  cursor:pointer;
+}
+.empty-note{
+  color:var(--stone);
+  font-size:13px;
+  text-align:center;
+  padding:20px 0;
+}
+
+/* ---------- ticket ---------- */
+.ticket-wrap{
+  display:none;
+  position:fixed; inset:0;
+  background:rgba(20,18,15,0.7);
+  align-items:center;
+  justify-content:center;
+  z-index:60;
+  padding:24px;
+}
+.ticket-wrap.show{ display:flex; }
+.ticket{
+  background:var(--white);
+  width:100%;
+  max-width:360px;
+  max-height:88vh;
+  overflow-y:auto;
+  padding:26px 24px 22px;
+  position:relative;
+}
+.ticket:before{
+  content:"";
+  position:absolute;
+  top:-13px; left:0; right:0; height:13px;
+  background-image:
+    linear-gradient(135deg, transparent 50%, var(--white) 50%),
+    linear-gradient(45deg, var(--white) 50%, transparent 50%);
+  background-size:16px 16px, 16px 16px;
+  background-position:0 0, 8px 0;
+  background-repeat:repeat-x;
+}
+.ticket-head{
+  text-align:center;
+  border-bottom:1px dashed var(--stone);
+  padding-bottom:12px;
+  margin-bottom:12px;
+}
+.ticket-head .zh{ font-size:20px; font-weight:700; }
+.ticket-head .sub{ font-size:11px; color:var(--stone); margin-top:4px; }
+.ticket-row{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  font-size:14px;
+  padding:5px 0;
+}
+.ticket-row .zh{ font-weight:600; }
+.ticket-row .meta{ color:var(--stone); font-size:12px; }
+.ticket-note{
+  font-size:12.5px;
+  color:var(--chili-dark);
+  padding:0 0 6px 4px;
+  margin-top:-3px;
+}
+.ticket-total{
+  display:flex;
+  justify-content:space-between;
+  border-top:1px dashed var(--stone);
+  margin-top:10px;
+  padding-top:10px;
+  font-weight:700;
+  font-size:15px;
+}
+.ticket-foot{
+  text-align:center;
+  font-size:11px;
+  color:var(--stone);
+  margin-top:16px;
+}
+.new-order-btn{
+  width:100%;
+  margin-top:18px;
+  background:var(--ink);
+  color:var(--paper);
+  border:none;
+  padding:13px;
+  border-radius:6px;
+  font-family:var(--font-body);
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <h1 id="brandName">Genki Diner</h1>
+    <p id="brandSub">Tap a language, build your order</p>
+  </div>
+  <div class="lang-switch">
+    <button id="btnEn" class="active" onclick="setLang('en')">EN</button>
+    <button id="btnJa" onclick="setLang('ja')">日本語</button>
+  </div>
+</header>
+
+<div class="tabs" id="tabs"></div>
+<div class="grid" id="grid"></div>
+
+<div class="cartbar" id="cartbar">
+  <div>
+    <div class="info" id="cartInfo">0 items</div>
+    <div class="total" id="cartTotal">NT$0</div>
+  </div>
+  <button onclick="openSheet()" id="reviewBtn">Review order</button>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeSheetBg(event)">
+  <div class="sheet">
+    <h2 id="sheetTitle">Your order</h2>
+    <div id="sheetItems"></div>
+    <div class="sheet-total">
+      <span id="sheetTotalLabel">Total</span>
+      <span id="sheetTotalValue">NT$0</span>
+    </div>
+    <button class="confirm-btn" id="confirmBtn" onclick="submitOrder()">Send order to kitchen</button>
+    <button class="close-link" id="closeLink" onclick="closeSheet()">Keep editing</button>
+  </div>
+</div>
+
+<div class="overlay" id="modOverlay" onclick="closeModSheetBg(event)">
+  <div class="sheet">
+    <h2 id="modSheetTitle"></h2>
+    <div id="modGroups"></div>
+    <div class="mod-qty-row">
+      <div class="stepper">
+        <button onclick="modQtyChange(-1)">−</button>
+        <span id="modQtyVal">1</span>
+        <button onclick="modQtyChange(1)">+</button>
+      </div>
+      <button class="mod-add-btn" id="modAddBtn" onclick="confirmAddWithMods()"></button>
+    </div>
+    <button class="close-link" onclick="closeModSheet()" id="modCloseLink">Cancel</button>
+  </div>
+</div>
+
+<div class="ticket-wrap" id="ticketWrap">
+  <div class="ticket">
+    <div class="ticket-head">
+      <div class="zh">廚房出單</div>
+      <div class="sub" id="ticketSub"></div>
+    </div>
+    <div id="ticketItems"></div>
+    <div class="ticket-total">
+      <span class="zh">總計</span>
+      <span id="ticketTotal"></span>
+    </div>
+    <div class="ticket-foot" id="ticketFoot"></div>
+    <button class="new-order-btn" id="newOrderBtn" onclick="resetOrder()">Start a new order</button>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   MENU DATA
+   ========================================================= */
+const MENU = [
+  // ---------- platters ----------
+  {id:10, cat:'platters', zh:'起司濃情小資女', en:'起司濃情小資女', ja:'起司濃情小資女', price:240,
+    drinkCombo:true, extraButter:true, eggChoice:true, eggDouble:true, hasSalad:true,
+    ing:{zh:['生菜沙拉','自製薯泥','藍莓優格','火腿','太陽蛋×2','法式吐司','起司醬'],
+         en:['Green salad','Homemade mashed potatoes','Blueberry yogurt','Ham','Sunny-side up eggs ×2','French toast','Cheese sauce'],
+         ja:['グリーンサラダ','自家製マッシュポテト','ブルーベリーヨーグルト','ハム','目玉焼き×2','フレンチトースト','チーズソース']}},
+  {id:11, cat:'platters', zh:'暖洋幸福輕熟女', en:'暖洋幸福輕熟女', ja:'暖洋幸福輕熟女', price:310,
+    drinkCombo:true, extraButter:true,
+    ing:{zh:['季節水果優格杯','美式脆薯','德國香腸','嫩蛋','火腿起司','莓果法式吐司'],
+         en:['Seasonal fruit yogurt cup','American crispy fries','German sausage','Scrambled eggs','Ham and cheese','Berry French toast'],
+         ja:['季節のフルーツヨーグルトカップ','アメリカ風クリスピーフライドポテト','ジャーマンソーセージ','スクランブルエッグ','ハム&チーズ','ベリーのフレンチトースト']}},
+  {id:12, cat:'platters', zh:'哇嘎噠滿足早餐盤', en:'哇嘎噠滿足早餐盤', ja:'哇嘎噠滿足早餐盤', price:320,
+    drinkCombo:true, breadUpgrade:true, extraButter:true, hasSalad:true,
+    ing:{zh:['生菜沙拉','美式脆薯','德國香腸','培根','起司歐姆蛋','薯餅','雜糧麵包','藍莓優格'],
+         en:['Green salad','American crispy fries','German sausage','Bacon','Cheese omelet','Hash brown','Multigrain bread','Blueberry yogurt'],
+         ja:['グリーンサラダ','アメリカ風クリスピーフライドポテト','ジャーマンソーセージ','ベーコン','チーズオムレツ','ハッシュブラウン','雑穀パン','ブルーベリーヨーグルト']}},
+  {id:13, cat:'platters', zh:'能量晨曦肌肉餐', en:'能量晨曦肌肉餐', ja:'能量晨曦肌肉餐', price:370,
+    drinkCombo:true, extraButter:true, hasSalad:true,
+    ing:{zh:['生菜沙拉','地瓜泥','酪梨','舒肥香草雞胸肉','季節水果優格杯','水煮蛋'],
+         en:['Green salad','Mashed sweet potato','Avocado','Sous-vide herb chicken breast','Seasonal fruit yogurt cup','Boiled egg'],
+         ja:['グリーンサラダ','さつまいもマッシュ','アボカド','低温調理ハーブチキンブレスト','季節のフルーツヨーグルトカップ','ゆで卵']}},
+  {id:14, cat:'platters', zh:'哇嘎噠經典香料雞腿', en:'哇嘎噠經典香料雞腿', ja:'哇嘎噠經典香料雞腿', price:350,
+    drinkCombo:true, breadUpgrade:true, extraButter:true, eggChoice:true, hasSalad:true,
+    ing:{zh:['生菜沙拉','美式脆薯','香煎雞腿排','太陽蛋','玉米濃湯','雜糧麵包'],
+         en:['Green salad','American crispy fries','Grilled chicken leg steak','Sunny-side up egg','Corn chowder','Multigrain bread'],
+         ja:['グリーンサラダ','アメリカ風クリスピーフライドポテト','グリルチキンレッグステーキ','目玉焼き','コーンチャウダー','雑穀パン']}},
+  {id:15, cat:'platters', zh:'西班牙蒜蝦嘎麵包', en:'西班牙蒜蝦嘎麵包', ja:'西班牙蒜蝦嘎麵包', price:390,
+    drinkCombo:true, hasSalad:true,
+    note:{zh:'本品項不附奶油，且不提供升級法式吐司', en:'No extra butter provided; French toast upgrade is not available for this item', ja:'バターは付きません。フレンチトーストへのアップグレードもご利用いただけません'},
+    ing:{zh:['生菜沙拉','美式脆薯','西班牙蒜辣鮮蝦','嫩炒蛋','雜糧麵包（請沾蒜蝦油食用）'],
+         en:['Green salad','American-style crispy fries','Spanish garlic shrimp','Soft scrambled eggs','Multigrain bread (please dip in the shrimp oil)'],
+         ja:['グリーンサラダ','アメリカ風クリスピーフライドポテト','スペイン風ガーリックシュリンプ','ふわとろスクランブルエッグ','雑穀パン（シュリンプオイルにつけてお召し上がりください）']}},
+  {id:16, cat:'platters', zh:'浪漫炙燒牛岩盤', en:'浪漫炙燒牛岩盤', ja:'浪漫炙燒牛岩盤', price:430,
+    drinkCombo:true, breadUpgrade:true, extraButter:true, hasSalad:true,
+    ing:{zh:['生菜沙拉','炸馬鈴薯角','炙燒牛排（七分熟）','起司歐姆蛋','玉米濃湯','雜糧麵包'],
+         en:['Green salad','Fried potato wedges','Flame-grilled steak (medium-well)','Cheese omelet','Corn chowder','Multigrain bread'],
+         ja:['グリーンサラダ','フライドポテトウェッジ','炙り焼きステーキ（ミディアムウェル）','チーズオムレツ','コーンチャウダー','雑穀パン']}},
+  {id:17, cat:'platters', zh:'法式香料紙包魚', en:'法式香料紙包魚', ja:'法式香料紙包魚', price:380,
+    drinkCombo:true, breadUpgrade:true, extraButter:true, hasSalad:true,
+    ing:{zh:['生菜沙拉','炸馬鈴薯角','香料烤海鱸魚佐時蔬','嫩炒蛋','玉米濃湯','雜糧麵包'],
+         en:['Green salad','Fried potato wedges','Roasted sea bass with seasonal vegetables','Soft scrambled eggs','Corn chowder','Multigrain bread'],
+         ja:['グリーンサラダ','フライドポテトウェッジ','香草ロースト海鱸魚と季節野菜','ふわとろスクランブルエッグ','コーンチャウダー','雑穀パン']}},
+  {id:18, cat:'platters', zh:'普羅旺斯蔬香饗宴', en:'普羅旺斯蔬香饗宴', ja:'普羅旺斯蔬香饗宴', price:330,
+    drinkCombo:true, extraButter:true,
+    note:{zh:'蛋奶素', en:'Vegetarian (lacto-ovo)', ja:'卵・乳製品可のベジタリアン'},
+    ing:{zh:['嫩蛋','季節水果優格杯','菇菇炒鮮蔬','地瓜泥','雜糧麵包'],
+         en:['Soft scrambled eggs','Seasonal fruit yogurt cup','Sautéed mushrooms & greens','Mashed sweet potato','Multigrain bread'],
+         ja:['とろとろスクランブルエッグ','季節のフルーツヨーグルトカップ','きのこと野菜のソテー','さつまいもマッシュ','雑穀パン']}},
+
+  // ---------- danish sandwiches ----------
+  {id:30, cat:'danish-sandwich', zh:'經典總匯丹麥', en:'經典總匯丹麥', ja:'經典總匯丹麥', price:120,
+    setUpgradeAvailable:true,
+    ing:{zh:['洋蔥','番茄','水煮蛋','千島醬','綜合生菜','培根','火腿','起司'],
+         en:['Onion','Tomato','Boiled egg','Thousand Island dressing','Mixed greens','Bacon','Ham','Cheese'],
+         ja:['玉ねぎ','トマト','ゆで卵','サウザンアイランドドレッシング','ミックスグリーンズ','ベーコン','ハム','チーズ']}},
+  {id:31, cat:'danish-sandwich', zh:'火腿蛋沙拉丹麥', en:'火腿蛋沙拉丹麥', ja:'火腿蛋沙拉丹麥', price:130,
+    setUpgradeAvailable:true,
+    ing:{zh:['蛋沙拉','玉米','核桃','蜂蜜芥末醬','綜合生菜','火腿'],
+         en:['Egg salad','Corn','Walnuts','Honey mustard','Mixed greens','Ham'],
+         ja:['エッグサラダ','コーン','くるみ','ハニーマスタード','ミックスグリーンズ','ハム']}},
+  {id:32, cat:'danish-sandwich', zh:'青醬舒肥雞肉丹麥', en:'青醬舒肥雞肉丹麥', ja:'青醬舒肥雞肉丹麥', price:160,
+    setUpgradeAvailable:true,
+    ing:{zh:['美乃滋','太陽蛋','青醬','雞胸肉','綜合生菜'],
+         en:['Mayonnaise','Sunny-side-up egg','Pesto','Chicken breast','Mixed greens'],
+         ja:['マヨネーズ','目玉焼き','バジルペースト','鶏むね肉','ミックスグリーンズ']}},
+  {id:33, cat:'danish-sandwich', zh:'薯泥起司丹麥', en:'薯泥起司丹麥', ja:'薯泥起司丹麥', price:110,
+    setUpgradeAvailable:true,
+    ing:{zh:['自製薯泥','玉米','培根','蜂蜜芥末醬','綜合生菜'],
+         en:['Homemade mashed potatoes','Corn','Bacon','Honey mustard','Mixed greens'],
+         ja:['自家製マッシュポテト','コーン','ベーコン','ハニーマスタード','ミックスグリーンズ']}},
+  {id:34, cat:'danish-sandwich', zh:'費城牛肉丹麥', en:'費城牛肉丹麥', ja:'費城牛肉丹麥', price:170,
+    setUpgradeAvailable:true,
+    ing:{zh:['哇沙米醬','起司','番茄片','蜂蜜芥末醬','洋蔥','炒牛五花'],
+         en:['Wasabi sauce','Cheese','Tomato slices','Honey mustard','Onion','Sautéed beef belly'],
+         ja:['わさびソース','チーズ','トマトスライス','ハニーマスタード','玉ねぎ','牛バラ肉のソテー']}},
+  {id:35, cat:'danish-sandwich', zh:'綜合起司炒蛋丹麥', en:'綜合起司炒蛋丹麥', ja:'綜合起司炒蛋丹麥', price:120,
+    setUpgradeAvailable:true,
+    ing:{zh:['美乃滋','莫札瑞拉起司','羅勒炒嫩蛋','黑胡椒','起司'],
+         en:['Mayonnaise','Mozzarella cheese','Soft scrambled egg with basil','Black pepper','Cheese'],
+         ja:['マヨネーズ','モッツァレラチーズ','バジル入りとろとろスクランブルエッグ','黒胡椒','チーズ']}},
+  {id:36, cat:'danish-sandwich', zh:'堅果起司丹麥', en:'堅果起司丹麥', ja:'堅果起司丹麥', price:110,
+    setUpgradeAvailable:true,
+    ing:{zh:['美乃滋','莫札瑞拉起司','核桃','蜂蜜','起司','羅勒','花生醬'],
+         en:['Mayonnaise','Mozzarella cheese','Walnuts','Honey','Cheese','Basil','Peanut butter'],
+         ja:['マヨネーズ','モッツァレラチーズ','くるみ','はちみつ','チーズ','バジル','ピーナッツバター']}},
+  {id:37, cat:'danish-sandwich', zh:'酪梨核桃丹麥', en:'酪梨核桃丹麥', ja:'酪梨核桃丹麥', price:160,
+    setUpgradeAvailable:true,
+    ing:{zh:['蛋沙拉','酪梨','核桃','蜂蜜'],
+         en:['Egg salad','Avocado','Walnuts','Honey'],
+         ja:['エッグサラダ','アボカド','くるみ','はちみつ']}},
+  {id:38, cat:'danish-sandwich', zh:'日式炸豬排丹麥', en:'日式炸豬排丹麥', ja:'日式炸豬排丹麥', price:170,
+    setUpgradeAvailable:true,
+    ing:{zh:['美乃滋','起司','日式炸豬排','蜂蜜芥末醬','嫩蛋','綜合生菜'],
+         en:['Mayonnaise','Cheese','Tonkatsu','Honey mustard','Soft scrambled egg','Mixed greens'],
+         ja:['マヨネーズ','チーズ','とんかつ','ハニーマスタード','とろとろスクランブルエッグ','ミックスグリーンズ']}},
+  {id:39, cat:'danish-sandwich', zh:'煙燻鮭魚蘋果丹麥', en:'煙燻鮭魚蘋果丹麥', ja:'煙燻鮭魚蘋果丹麥', price:180,
+    setUpgradeAvailable:true,
+    ing:{zh:['蛋沙拉','冷燻鮭魚','魚卵芥末醬','蘋果','綜合生菜'],
+         en:['Egg salad','Cold-smoked salmon','Roe mustard sauce','Apple','Mixed greens'],
+         ja:['エッグサラダ','コールドスモークサーモン','魚卵マスタードソース','りんご','ミックスグリーンズ']}},
+
+  // ---------- black burgers ----------
+  {id:40, cat:'black-burger', zh:'夏威夷牛肉堡', en:'夏威夷牛肉堡', ja:'夏威夷牛肉堡', price:230,
+    setUpgradeAvailable:true,
+    ing:{zh:['美乃滋','番茄','番茄醬','切達起司','培根','牛肉排','鳳梨','洋蔥圈','綜合生菜'],
+         en:['Mayonnaise','Tomato','Ketchup','Cheddar cheese','Bacon','Beef patty','Pineapple','Onion rings','Mixed greens'],
+         ja:['マヨネーズ','トマト','ケチャップ','チェダーチーズ','ベーコン','ビーフパテ','パイナップル','オニオンリング','ミックスグリーンズ']}},
+  {id:41, cat:'black-burger', zh:'花生牛肉堡', en:'花生牛肉堡', ja:'花生牛肉堡', price:200,
+    setUpgradeAvailable:true,
+    ing:{zh:['美乃滋','洋蔥','蘋果','番茄','牛肉排','花生醬','綜合生菜'],
+         en:['Mayonnaise','Onion','Apple','Tomato','Beef patty','Peanut butter','Mixed greens'],
+         ja:['マヨネーズ','玉ねぎ','りんご','トマト','ビーフパテ','ピーナッツバター','ミックスグリーンズ']}},
+  {id:42, cat:'black-burger', zh:'熔岩起司牛肉堡', en:'熔岩起司牛肉堡', ja:'熔岩起司牛肉堡', price:200,
+    setUpgradeAvailable:true,
+    ing:{zh:['美乃滋','洋蔥','番茄','嫩蛋','綜合生菜','起司醬'],
+         en:['Mayonnaise','Onion','Tomato','Soft scrambled egg','Mixed greens','Lava cheddar cheese sauce'],
+         ja:['マヨネーズ','玉ねぎ','トマト','とろとろスクランブルエッグ','ミックスグリーンズ','溶岩チェダーチーズソース']}},
+
+  // ---------- drinks ----------
+  {id:20, cat:'drinks', zh:'紅茶', en:'Black Tea', ja:'紅茶', price:40,
+    subGroupsKey:'tea',
+    ing:{zh:['紅茶'],en:['Black tea'],ja:['紅茶']}},
+  {id:21, cat:'drinks', zh:'綠茶', en:'Green Tea', ja:'緑茶', price:40,
+    subGroupsKey:'tea',
+    ing:{zh:['綠茶'],en:['Green tea'],ja:['緑茶']}},
+  {id:22, cat:'drinks', zh:'美式咖啡', en:'Americano', ja:'アメリカーノ', price:120,
+    subGroupsKey:'tempOnly',
+    ing:{zh:['美式咖啡'],en:['Americano'],ja:['アメリカーノ']}},
+  {id:23, cat:'drinks', zh:'哇嘎噠拿鐵', en:'Wagada Latte', ja:'ワガダラテ', price:140,
+    subGroupsKey:'tempMilk',
+    ing:{zh:['拿鐵'],en:['Latte'],ja:['ラテ']}},
+  {id:24, cat:'drinks', zh:'卡布奇諾', en:'Cappuccino', ja:'カプチーノ', price:140,
+    subGroupsKey:'none',
+    note:{zh:'熱飲，含肉桂粉', en:'Hot only, topped with cinnamon powder', ja:'ホットのみ、シナモンパウダー入り'},
+    ing:{zh:['卡布奇諾','肉桂粉'],en:['Cappuccino','Cinnamon powder'],ja:['カプチーノ','シナモンパウダー']}},
+  {id:25, cat:'drinks', zh:'風味拿鐵', en:'Flavored Latte', ja:'フレーバーラテ', price:160,
+    subGroupsKey:'tempMilkFlavor',
+    ing:{zh:['拿鐵','風味糖漿'],en:['Latte','Flavor syrup'],ja:['ラテ','フレーバーシロップ']}},
+  {id:26, cat:'drinks', zh:'焦糖瑪其朵', en:'Caramel Macchiato', ja:'キャラメルマキアート', price:170,
+    subGroupsKey:'tempMilk',
+    ing:{zh:['濃縮咖啡','牛奶','焦糖'],en:['Espresso','Milk','Caramel'],ja:['エスプレッソ','ミルク','キャラメル']}},
+  {id:27, cat:'drinks', zh:'海鹽焦糖拿鐵', en:'Sea Salt Caramel Latte', ja:'海塩キャラメルラテ', price:180,
+    subGroupsKey:'tempMilk',
+    ing:{zh:['拿鐵','海鹽','焦糖'],en:['Latte','Sea salt','Caramel'],ja:['ラテ','海塩','キャラメル']}},
+  {id:28, cat:'drinks', zh:'柳橙冰美式', en:'Orange Iced Americano', ja:'オレンジアイスアメリカーノ', price:140,
+    subGroupsKey:'none',
+    note:{zh:'甜度冰塊固定', en:'Sweetness and ice level are fixed', ja:'甘さ・氷の量は固定です'},
+    ing:{zh:['美式咖啡','柳橙'],en:['Americano','Orange'],ja:['アメリカーノ','オレンジ']}},
+  {id:29, cat:'drinks', zh:'炙燒黑糖拿鐵', en:'Torched Brown Sugar Latte', ja:'炙り黒糖ラテ', price:160,
+    subGroupsKey:'tempMilk',
+    ing:{zh:['拿鐵','黑糖'],en:['Latte','Brown sugar'],ja:['ラテ','黒糖']}},
+  {id:100, cat:'drinks', zh:'英式伯爵紅茶', en:'Earl Grey Tea', ja:'アールグレイティー', price:100,
+    subGroupsKey:'tea',
+    ing:{zh:['伯爵紅茶'],en:['Earl Grey tea'],ja:['アールグレイティー']}},
+  {id:101, cat:'drinks', zh:'鐵觀音烏龍茶', en:'Tieguanyin Oolong Tea', ja:'鉄観音烏龍茶', price:100,
+    subGroupsKey:'tea',
+    ing:{zh:['鐵觀音烏龍茶'],en:['Tieguanyin oolong tea'],ja:['鉄観音烏龍茶']}},
+  {id:102, cat:'drinks', zh:'金萱烏龍茶', en:'Jinxuan Oolong Tea', ja:'金萱烏龍茶', price:100,
+    subGroupsKey:'tea',
+    ing:{zh:['金萱烏龍'],en:['Jinxuan oolong tea'],ja:['金萱烏龍茶']}},
+  {id:103, cat:'drinks', zh:'熱帶水果茶', en:'Tropical Fruit Tea', ja:'トロピカルフルーツティー', price:110,
+    subGroupsKey:'tea',
+    ing:{zh:['紅茶','蘋果','柳橙','奇異果','熱帶水果醬'],en:['Black tea','Apple','Orange','Kiwi','Tropical fruit sauce'],ja:['紅茶','りんご','オレンジ','キウイ','トロピカルフルーツソース']}},
+  {id:104, cat:'drinks', zh:'蜜香伯爵歐蕾', en:'Honey Earl Grey Au Lait', ja:'蜂蜜アールグレイオレ', price:110,
+    subGroupsKey:'tempOnly',
+    ing:{zh:['伯爵紅茶','蜂蜜','鮮奶'],en:['Earl Grey tea','Honey','Fresh milk'],ja:['アールグレイティー','はちみつ','牛乳']}},
+  {id:105, cat:'drinks', zh:'鐵觀音黑糖歐蕾', en:'Tieguanyin Brown Sugar Au Lait', ja:'鉄観音黒糖オレ', price:120,
+    subGroupsKey:'tempOnly',
+    ing:{zh:['鐵觀音烏龍茶','黑糖醬','鮮奶'],en:['Tieguanyin oolong tea','Brown sugar syrup','Fresh milk'],ja:['鉄観音烏龍茶','黒糖ソース','牛乳']}},
+  {id:106, cat:'drinks', zh:'海鹽焦糖歐蕾', en:'Sea Salt Caramel Au Lait', ja:'海塩キャラメルオレ', price:130,
+    subGroupsKey:'tempOnly',
+    ing:{zh:['紅茶','海鹽焦糖醬','鮮奶','岩鹽'],en:['Black tea','Sea salt caramel sauce','Fresh milk','Rock salt'],ja:['紅茶','海塩キャラメルソース','牛乳','岩塩']}},
+  {id:107, cat:'drinks', zh:'烤布蕾奶茶', en:'Crème Brûlée Milk Tea', ja:'クレームブリュレミルクティー', price:120,
+    subGroupsKey:'tempOnly',
+    ing:{zh:['紅茶','布蕾醬','鮮奶','炙燒黑糖'],en:['Black tea','Crème brûlée sauce','Fresh milk','Torched brown sugar'],ja:['紅茶','クレームブリュレソース','牛乳','炙り黒糖']}},
+  {id:108, cat:'drinks', zh:'炙燒黑糖牛奶', en:'Torched Brown Sugar Milk', ja:'炙り黒糖ミルク', price:120,
+    subGroupsKey:'tempOnly',
+    ing:{zh:['黑糖醬','鮮奶','炙燒黑糖'],en:['Brown sugar syrup','Fresh milk','Torched brown sugar'],ja:['黒糖ソース','牛乳','炙り黒糖']}},
+  {id:109, cat:'drinks', zh:'抹茶拿鐵', en:'Matcha Latte', ja:'抹茶ラテ', price:150,
+    subGroupsKey:'tea',
+    ing:{zh:['抹茶粉','鮮奶'],en:['Matcha powder','Fresh milk'],ja:['抹茶粉','牛乳']}},
+
+  // ---------- french toast ----------
+  {id:50, cat:'french-toast', zh:'原味楓糖', en:'原味楓糖', ja:'原味楓糖', price:100,
+    setUpgradeAvailable:true,
+    ing:{zh:['丹麥法式吐司','糖粉','楓糖糖漿'],en:['Danish French toast','Powdered sugar','Maple syrup'],ja:['デニッシュフレンチトースト','粉砂糖','メープルシロップ']}},
+  {id:51, cat:'french-toast', zh:'綜合莓果脆片', en:'綜合莓果脆片', ja:'綜合莓果脆片', price:130,
+    setUpgradeAvailable:true,
+    ing:{zh:['丹麥法式吐司','玉米脆片','草莓','藍莓','糖粉','蜂蜜'],en:['Danish French toast','Corn flakes','Strawberry','Blueberry','Powdered sugar','Honey'],ja:['デニッシュフレンチトースト','コーンフレーク','いちご','ブルーベリー','粉砂糖','はちみつ']}},
+  {id:52, cat:'french-toast', zh:'熔岩起司', en:'熔岩起司', ja:'熔岩起司', price:130,
+    setUpgradeAvailable:true,
+    ing:{zh:['丹麥法式吐司','熔岩起司淋醬'],en:['Danish French toast','Lava cheddar cheese sauce'],ja:['デニッシュフレンチトースト','溶岩チェダーチーズソース']}},
+  {id:53, cat:'french-toast', zh:'咬咬太陽', en:'咬咬太陽', ja:'咬咬太陽', price:150,
+    setUpgradeAvailable:true, eggChoice:true, eggVariant:'basic',
+    ing:{zh:['丹麥法式吐司','花生醬','培根','太陽蛋','起司'],en:['Danish French toast','Peanut butter','Bacon','Sunny-side-up egg','Cheese'],ja:['デニッシュフレンチトースト','ピーナッツバター','ベーコン','目玉焼き','チーズ']}},
+
+  // ---------- salad ----------
+  {id:55, cat:'salad', zh:'綠意舒芙雞胸沙拉', en:'綠意舒芙雞胸沙拉', ja:'綠意舒芙雞胸沙拉', price:250,
+    hasSalad:true, setUpgradeAvailable:true, setUpgradeVariant:'salad',
+    ing:{zh:['綜合生菜','核桃','番茄','柳橙','舒肥雞胸','水煮蛋','起司'],en:['Mixed greens','Walnuts','Tomato','Orange','Sous-vide chicken breast','Boiled egg','Cheese'],ja:['ミックスグリーンズ','くるみ','トマト','オレンジ','低温調理チキンブレスト','ゆで卵','チーズ']}},
+  {id:56, cat:'salad', zh:'密薯香甜蘿美沙拉', en:'密薯香甜蘿美沙拉', ja:'密薯香甜蘿美沙拉', price:180,
+    hasSalad:true, setUpgradeAvailable:true, setUpgradeVariant:'salad',
+    ing:{zh:['綜合生菜','核桃','番茄','柳橙','自製地瓜泥','自製馬鈴薯泥','水煮蛋','起司'],en:['Mixed greens','Walnuts','Tomato','Orange','Homemade mashed sweet potato','Homemade mashed potatoes','Boiled egg','Cheese'],ja:['ミックスグリーンズ','くるみ','トマト','オレンジ','自家製さつまいもマッシュ','自家製マッシュポテト','ゆで卵','チーズ']}},
+  {id:57, cat:'salad', zh:'溫暖牛菲香溫沙拉', en:'溫暖牛菲香溫沙拉', ja:'溫暖牛菲香溫沙拉', price:290,
+    setUpgradeAvailable:true, setUpgradeVariant:'salad',
+    note:{zh:'固定搭配和風醬', en:'Served with wafu dressing (fixed, not selectable)', ja:'和風ドレッシング固定（選択不可）'},
+    ing:{zh:['綜合生菜','番茄','柳橙','炙燒牛排','時蔬炒菇菇','起司'],en:['Mixed greens','Tomato','Orange','Seared steak','Sautéed seasonal vegetables & mushrooms','Cheese'],ja:['ミックスグリーンズ','トマト','オレンジ','炙り焼きステーキ','季節野菜ときのこのソテー','チーズ']}},
+  {id:58, cat:'salad', zh:'法式酪梨田園沙拉', en:'法式酪梨田園沙拉', ja:'法式酪梨田園沙拉', price:290,
+    hasSalad:true, setUpgradeAvailable:true, setUpgradeVariant:'salad',
+    ing:{zh:['綜合生菜','核桃','番茄','柳橙','酪梨','水煮蛋','起司'],en:['Mixed greens','Walnuts','Tomato','Orange','Avocado','Boiled egg','Cheese'],ja:['ミックスグリーンズ','くるみ','トマト','オレンジ','アボカド','ゆで卵','チーズ']}},
+  {id:59, cat:'salad', zh:'北歐晨曦煙燻鮭魚沙拉', en:'北歐晨曦煙燻鮭魚沙拉', ja:'北歐晨曦煙燻鮭魚沙拉', price:290,
+    hasSalad:true, setUpgradeAvailable:true, setUpgradeVariant:'salad',
+    ing:{zh:['綜合生菜','核桃','番茄','柳橙','冷燻鮭魚','魚卵芥末醬','水煮蛋','起司'],en:['Mixed greens','Walnuts','Tomato','Orange','Cold-smoked salmon','Roe mustard sauce','Boiled egg','Cheese'],ja:['ミックスグリーンズ','くるみ','トマト','オレンジ','コールドスモークサーモン','魚卵マスタードソース','ゆで卵','チーズ']}},
+
+  // ---------- kids meal ----------
+  {id:60, cat:'kids', zh:'我愛吃麵麵', en:'我愛吃麵麵', ja:'我愛吃麵麵', price:200,
+    kidsDrink:true,
+    note:{zh:'限120公分以下兒童', en:'For children under 120cm only', ja:'身長120cm以下のお子様限定'},
+    ing:{zh:['義式肉醬麵','薯條','新鮮水果','玉米濃湯'],en:['Italian meat sauce pasta','French fries','Fresh fruit','Corn chowder'],ja:['イタリアンミートソースパスタ','フライドポテト','フレッシュフルーツ','コーンチャウダー']}},
+  {id:61, cat:'kids', zh:'我愛吃飯飯', en:'我愛吃飯飯', ja:'我愛吃飯飯', price:250,
+    kidsDrink:true,
+    note:{zh:'限120公分以下兒童；咖哩內含巧克力', en:'For children under 120cm only; curry contains chocolate', ja:'身長120cm以下のお子様限定；カレーにチョコレートが入っています'},
+    ing:{zh:['咖哩飯','雞塊','嫩蛋','新鮮水果','玉米濃湯'],en:['Curry rice','Chicken nuggets','Soft scrambled egg','Fresh fruit','Corn chowder'],ja:['カレーライス','チキンナゲット','とろとろスクランブルエッグ','フレッシュフルーツ','コーンチャウダー']}},
+  {id:62, cat:'kids', zh:'我最不挑食', en:'我最不挑食', ja:'我最不挑食', price:250,
+    kidsDrink:true,
+    note:{zh:'限120公分以下兒童', en:'For children under 120cm only', ja:'身長120cm以下のお子様限定'},
+    ing:{zh:['菇菇時蔬奶油燉飯','嫩蛋','新鮮水果','玉米濃湯'],en:['Mushroom & vegetable cream risotto','Soft scrambled egg','Fresh fruit','Corn chowder'],ja:['きのこと野菜のクリームリゾット','とろとろスクランブルエッグ','フレッシュフルーツ','コーンチャウダー']}},
+
+  // ---------- a la carte ----------
+  {id:70, cat:'alacarte', zh:'玉米濃湯', en:'玉米濃湯', ja:'玉米濃湯', price:80,
+    ing:{zh:['玉米濃湯'],en:['Corn chowder'],ja:['コーンチャウダー']}},
+  {id:71, cat:'alacarte', zh:'美式脆薯', en:'美式脆薯', ja:'美式脆薯', price:120,
+    ing:{zh:['炸薯條','蜂蜜芥末醬'],en:['French fries','Honey mustard'],ja:['フライドポテト','ハニーマスタード']}},
+  {id:72, cat:'alacarte', zh:'熔岩起司脆薯', en:'熔岩起司脆薯', ja:'熔岩起司脆薯', price:150,
+    ing:{zh:['炸薯條','熔岩起司淋醬','起司'],en:['French fries','Lava cheddar cheese sauce','Cheese'],ja:['フライドポテト','溶岩チェダーチーズソース','チーズ']}},
+  {id:73, cat:'alacarte', zh:'煙燻鮭魚卷', en:'煙燻鮭魚卷', ja:'煙燻鮭魚卷', price:200,
+    ing:{zh:['冷燻鮭魚','魚卵芥末醬','生菜','青醬','奶油乳酪','蘋果'],en:['Cold-smoked salmon','Roe mustard sauce','Lettuce','Pesto','Cream cheese','Apple'],ja:['コールドスモークサーモン','魚卵マスタードソース','レタス','バジルペースト','クリームチーズ','りんご']}},
+  {id:74, cat:'alacarte', zh:'炸類拼盤', en:'炸類拼盤', ja:'炸類拼盤', price:390,
+    ing:{zh:['炸薯條','雞塊','雞柳條','洋蔥圈','紐奧良雞翅'],en:['French fries','Chicken nuggets','Chicken tenders','Onion rings','New Orleans chicken wings'],ja:['フライドポテト','チキンナゲット','チキンテンダー','オニオンリング','ニューオーリンズチキンウィング']}},
+
+  // ---------- pasta / risotto ----------
+  {id:80, cat:'pasta-risotto', zh:'一隻雞腿就很飽', en:'一隻雞腿就很飽', ja:'一隻雞腿就很飽', price:320,
+    drinkCombo:true, breadUpgrade:true, pastaFull:true,
+    ing:{zh:['香料烤雞腿'],en:['Roasted spiced chicken leg'],ja:['香草ローストチキンレッグ']}},
+  {id:81, cat:'pasta-risotto', zh:'真的很蝦沒在騙', en:'真的很蝦沒在騙', ja:'真的很蝦沒在騙', price:420,
+    drinkCombo:true, breadUpgrade:true, pastaFull:true,
+    ing:{zh:['鮮蝦'],en:['Fresh shrimp'],ja:['新鮮エビ']}},
+  {id:82, cat:'pasta-risotto', zh:'超多蛤罵吃到爽', en:'超多蛤罵吃到爽', ja:'超多蛤罵吃到爽', price:350,
+    drinkCombo:true, breadUpgrade:true, pastaFull:true,
+    ing:{zh:['蛤蜊'],en:['Clams'],ja:['あさり']}},
+  {id:83, cat:'pasta-risotto', zh:'松阪豬香香脆脆', en:'松阪豬香香脆脆', ja:'松阪豬香香脆脆', price:420,
+    drinkCombo:true, breadUpgrade:true, pastaFull:true,
+    ing:{zh:['松阪豬肉'],en:['Pork collar (matsusaka pork)'],ja:['豚トントロ（松阪豚）']}},
+  {id:84, cat:'pasta-risotto', zh:'要等七分熟牛排', en:'要等七分熟牛排', ja:'要等七分熟牛排', price:450,
+    drinkCombo:true, breadUpgrade:true, pastaFull:true,
+    ing:{zh:['炙燒牛肉'],en:['Seared beef'],ja:['炙り焼き牛肉']}},
+
+  // ---------- chef's special ----------
+  {id:90, cat:'chef-special', zh:'紅酒燉牛肉佐香料蔬菜', en:'紅酒燉牛肉佐香料蔬菜', ja:'紅酒燉牛肉佐香料蔬菜', price:380,
+    drinkCombo:true, breadUpgrade:true,
+    ing:{zh:['香料烤時蔬','紅酒燉牛肉','白飯','水煮蛋','自製馬鈴薯泥'],en:['Roasted spiced vegetables','Red wine beef stew','Steamed rice','Boiled egg','Homemade mashed potatoes'],ja:['香草ロースト野菜','赤ワインビーフシチュー','ご飯','ゆで卵','自家製マッシュポテト']}},
+  {id:91, cat:'chef-special', zh:'日式豬排咖哩飯', en:'日式豬排咖哩飯', ja:'日式豬排咖哩飯', price:280,
+    drinkCombo:true, breadUpgrade:true,
+    ing:{zh:['炸豬排','白飯','水煮蛋','咖哩醬'],en:['Tonkatsu','Steamed rice','Boiled egg','Curry sauce'],ja:['とんかつ','ご飯','ゆで卵','カレーソース']}},
+  {id:92, cat:'chef-special', zh:'烤雞腿排咖哩飯', en:'烤雞腿排咖哩飯', ja:'烤雞腿排咖哩飯', price:300,
+    drinkCombo:true, breadUpgrade:true,
+    ing:{zh:['香料烤雞腿','白飯','水煮蛋','咖哩醬'],en:['Roasted spiced chicken leg','Steamed rice','Boiled egg','Curry sauce'],ja:['香草ローストチキンレッグ','ご飯','ゆで卵','カレーソース']}},
+  {id:93, cat:'chef-special', zh:'炸牡蠣咖哩飯', en:'炸牡蠣咖哩飯', ja:'炸牡蠣咖哩飯', price:320,
+    drinkCombo:true, breadUpgrade:true,
+    ing:{zh:['炸牡蠣','白飯','水煮蛋','咖哩醬'],en:['Fried oysters','Steamed rice','Boiled egg','Curry sauce'],ja:['牡蠣フライ','ご飯','ゆで卵','カレーソース']}},
+  {id:94, cat:'chef-special', zh:'松露香煎松阪豬', en:'松露香煎松阪豬', ja:'松露香煎松阪豬', price:480,
+    drinkCombo:true, breadUpgrade:true, pastaNoodleSpice:true,
+    ing:{zh:['松阪豬肉','松露奶油醬'],en:['Pork collar (matsusaka pork)','Truffle cream sauce'],ja:['豚トントロ（松阪豚）','トリュフクリームソース']}},
+  {id:95, cat:'chef-special', zh:'松露野菇', en:'松露野菇', ja:'松露野菇', price:360,
+    drinkCombo:true, breadUpgrade:true, pastaNoodleSpice:true,
+    note:{zh:'蛋奶素', en:'Vegetarian (lacto-ovo)', ja:'卵・乳製品可のベジタリアン'},
+    ing:{zh:['綜合菇','松露奶油醬'],en:['Mixed mushrooms','Truffle cream sauce'],ja:['ミックスマッシュルーム','トリュフクリームソース']}},
+  {id:96, cat:'chef-special', zh:'自製義式肉醬', en:'自製義式肉醬', ja:'自製義式肉醬', price:280,
+    drinkCombo:true, breadUpgrade:true,
+    ing:{zh:['義式肉醬','義大利麵'],en:['Italian meat sauce','Spaghetti'],ja:['イタリアンミートソース','スパゲッティ']}},
+];
+
+
+/* =========================================================
+   CATEGORIES
+   ========================================================= */
+const CATS = [
+  {id:'platters', en:'Platters', ja:'盛り合わせ'},
+  {id:'danish-sandwich', en:'Danish Sandwich', ja:'デニッシュサンド'},
+  {id:'black-burger', en:'Black Burger', ja:'ブラックバーガー'},
+  {id:'french-toast', en:'French Toast', ja:'フレンチトースト'},
+  {id:'salad', en:'Salad', ja:'サラダ'},
+  {id:'alacarte', en:'A La Carte', ja:'単品'},
+  {id:'kids', en:'Kids Meal', ja:'お子様セット'},
+  {id:'pasta-risotto', en:'Pasta / Risotto', ja:'パスタ・リゾット'},
+  {id:'chef-special', en:"Chef's Special", ja:'シェフのおすすめ'},
+  {id:'drinks', en:'Drinks', ja:'ドリンク'},
+];
+
+/* =========================================================
+   REUSABLE MODIFIER GROUPS
+   ========================================================= */
+const TEMP_CHOICES = [
+  {id:'normal-ice', zh:'正常冰', en:'Regular ice', ja:'氷普通', price:0},
+  {id:'less-ice', zh:'去冰', en:'Less ice', ja:'氷少なめ', price:0},
+  {id:'hot', zh:'熱', en:'Hot', ja:'ホット', price:0},
+];
+const SWEETNESS_CHOICES = [
+  {id:'sweet', zh:'有糖', en:'Sweet', ja:'加糖', price:0},
+  {id:'unsweet', zh:'無糖', en:'Unsweetened', ja:'無糖', price:0},
+];
+const TEMP_GROUP = {id:'temp', required:true, label:{zh:'冰塊／溫度',en:'Ice / Temperature',ja:'氷・温度'}, choices:TEMP_CHOICES};
+const SWEETNESS_GROUP = {id:'sweetness', required:true, label:{zh:'甜度',en:'Sweetness',ja:'甘さ'}, choices:SWEETNESS_CHOICES};
+const OAT_MILK_GROUP = {id:'milk', required:false, defaultId:'regular', label:{zh:'鮮奶（可選）',en:'Milk (optional)',ja:'ミルク（任意）'}, choices:[
+  {id:'regular', zh:'原味鮮奶', en:'Regular milk', ja:'通常のミルク', price:0},
+  {id:'oat', zh:'換燕麥奶', en:'Oat milk', ja:'オーツミルクに変更', price:15},
+]};
+const FLAVOR_GROUP = {id:'flavor', required:true, label:{zh:'風味（擇一）',en:'Flavor (choose one)',ja:'フレーバー（1つ）'}, choices:[
+  {id:'vanilla', zh:'香草', en:'Vanilla', ja:'バニラ', price:0},
+  {id:'caramel', zh:'焦糖', en:'Caramel', ja:'キャラメル', price:0},
+  {id:'rose', zh:'玫瑰', en:'Rose', ja:'ローズ', price:0},
+  {id:'brownsugar', zh:'黑糖', en:'Brown sugar', ja:'黒糖', price:0},
+]};
+
+const DRINK_SUBGROUPS = {
+  none: [],
+  tempOnly: [TEMP_GROUP],
+  tempMilk: [TEMP_GROUP, OAT_MILK_GROUP],
+  tempMilkFlavor: [TEMP_GROUP, OAT_MILK_GROUP, FLAVOR_GROUP],
+  tea: [SWEETNESS_GROUP, TEMP_GROUP],
+};
+
+const EGG_GROUP_DOUBLE = {id:'egg', required:true, label:{zh:'蛋的熟度',en:'Egg style',ja:'卵の焼き加減'}, choices:[
+  {id:'well', zh:'全熟', en:'Well-done', ja:'固焼き', price:0},
+  {id:'soft', zh:'半熟', en:'Soft / runny', ja:'半熟', price:0},
+  {id:'mixed', zh:'全熟半熟各一', en:'One well-done, one soft', ja:'固焼きと半熟を1つずつ', price:0},
+  {id:'scramble', zh:'嫩蛋', en:'Soft scrambled egg', ja:'とろとろスクランブルエッグ', price:10},
+  {id:'roll', zh:'蛋捲', en:'Rolled omelette', ja:'卵焼き', price:30},
+]};
+const EGG_GROUP_SINGLE = {id:'egg', required:true, label:{zh:'蛋的熟度',en:'Egg style',ja:'卵の焼き加減'}, choices:[
+  {id:'well', zh:'全熟', en:'Well-done', ja:'固焼き', price:0},
+  {id:'soft', zh:'半熟', en:'Soft / runny', ja:'半熟', price:0},
+  {id:'scramble', zh:'嫩蛋', en:'Soft scrambled egg', ja:'とろとろスクランブルエッグ', price:10},
+  {id:'roll', zh:'蛋捲', en:'Rolled omelette', ja:'卵焼き', price:30},
+]};
+
+const DRESSING_GROUP = {id:'dressing', required:true, label:{zh:'沙拉醬料',en:'Salad dressing',ja:'サラダドレッシング'}, choices:[
+  {id:'thousand', zh:'千島醬', en:'Thousand Island dressing', ja:'サウザンアイランドドレッシング', price:0},
+  {id:'passion-yogurt', zh:'百香優格醬', en:'Passion fruit yogurt dressing', ja:'パッションフルーツヨーグルトドレッシング', price:0},
+  {id:'wafu', zh:'和風醬', en:'Japanese-style (wafu) dressing', ja:'和風ドレッシング', price:0},
+  {id:'no-dressing', zh:'不加醬', en:'No dressing', ja:'ドレッシングなし', price:0},
+]};
+
+const BREAD_UPGRADE_CHOICES = [
+  {id:'none', zh:'原味雜糧麵包', en:'Multigrain bread (no upgrade)', ja:'雑穀パン（アップグレードなし）', price:0},
+  {id:'berry', zh:'升級莓果法式吐司', en:'Upgrade: Berry French toast', ja:'ベリーフレンチトーストにアップグレード', price:30},
+  {id:'lava', zh:'升級熔岩法式吐司', en:'Upgrade: Lava French toast', ja:'溶岩フレンチトーストにアップグレード', price:30},
+];
+const BREAD_GROUP = {id:'bread', required:false, defaultId:'none', label:{zh:'吐司升級（可選）',en:'Bread upgrade (optional)',ja:'パンのアップグレード（任意）'}, choices:BREAD_UPGRADE_CHOICES};
+
+const EXTRA_BUTTER_CHOICES = [
+  {id:'no', zh:'不加奶油', en:'No extra butter', ja:'追加バターなし', price:0},
+  {id:'yes', zh:'加奶油', en:'Extra butter', ja:'追加バター', price:5},
+];
+const BUTTER_GROUP = {id:'butter', required:false, defaultId:'no', label:{zh:'加奶油（可選）',en:'Extra butter (optional)',ja:'追加バター（任意）'}, choices:EXTRA_BUTTER_CHOICES};
+
+const SET_A_SIDE_GROUP = {id:'setASide', required:true, label:{zh:'A套餐配菜（擇一）',en:'Set A side (choose one)',ja:'セットAのサイド（1つ）'}, choices:[
+  {id:'fries', zh:'薯條', en:'French fries', ja:'フライドポテト', price:0},
+  {id:'nuggets', zh:'雞塊', en:'Chicken nuggets', ja:'チキンナゲット', price:0},
+]};
+const SET_A_SALAD_GROUP = {id:'setASalad', required:true, label:{zh:'A套餐副餐（擇一）',en:'Set A side dish (choose one)',ja:'セットAの副菜（1つ）'}, choices:[
+  {id:'salad', zh:'沙拉', en:'Side salad', ja:'サイドサラダ', price:0, subGroups:[DRESSING_GROUP]},
+  {id:'yogurt', zh:'優格杯', en:'Yogurt cup', ja:'ヨーグルトカップ', price:0},
+]};
+
+function buildDrinkChoices(){
+  const freeNames = ['紅茶','綠茶'];
+  return MENU.filter(m=>m.cat==='drinks').map(d=>({
+    id:'drink-'+d.id, zh:d.zh, en:d.en, ja:d.ja,
+    price: freeNames.includes(d.zh) ? 0 : Math.max(0, d.price - 30),
+    subGroups: DRINK_SUBGROUPS[d.subGroupsKey || 'none'],
+  }));
+}
+const DRINK_GROUP = {
+  id:'drink', required:true,
+  label:{zh:'套餐飲料（含綠茶／紅茶，可換購）', en:'Set drink (green/black tea included, swap available)', ja:'セットドリンク（緑茶・紅茶付き、変更可）'},
+  get choices(){ return buildDrinkChoices(); },
+};
+
+const SET_UPGRADE_GROUP = {id:'setUpgrade', required:false, defaultId:'none', label:{zh:'升級套餐（可選）',en:'Upgrade to a set (optional)',ja:'セットへのアップグレード（任意）'}, choices:[
+  {id:'none', zh:'不升級套餐', en:'No set upgrade', ja:'セットアップグレードなし', price:0},
+  {id:'setA', zh:'升級 A 套餐（薯條或雞塊＋沙拉或優格＋套餐茶飲）', en:'Upgrade to Set A (fries or nuggets + salad or yogurt + set tea)', ja:'セットAにアップグレード（フライドポテトorナゲット＋サラダorヨーグルト＋セットドリンク）', price:119, subGroups:[SET_A_SIDE_GROUP, SET_A_SALAD_GROUP, DRINK_GROUP]},
+  {id:'setB', zh:'升級 B 套餐（玉米濃湯＋手作甜點＋套餐茶飲）', en:'Upgrade to Set B (corn chowder + handmade dessert + set tea)', ja:'セットBにアップグレード（コーンチャウダー＋手作りデザート＋セットドリンク）', price:159, subGroups:[DRINK_GROUP]},
+]};
+
+const EGG_GROUP_TOAST = {id:'egg', required:true, label:{zh:'蛋的熟度',en:'Egg style',ja:'卵の焼き加減'}, choices:[
+  {id:'well', zh:'全熟', en:'Well-done', ja:'固焼き', price:0},
+  {id:'soft', zh:'半熟', en:'Soft / runny', ja:'半熟', price:0},
+]};
+
+const KIDS_DRINK_GROUP = {id:'kidsDrink', required:true, label:{zh:'附餐飲料（擇一）',en:'Included drink (choose one)',ja:'付属ドリンク（1つ）'}, choices:[
+  {id:'milk', zh:'鮮奶', en:'Milk', ja:'ミルク', price:0},
+  {id:'oj', zh:'柳橙汁', en:'Orange juice', ja:'オレンジジュース', price:0},
+]};
+
+const SAUCE_GROUP = {id:'sauce', required:true, label:{zh:'醬汁（擇一）',en:'Sauce (choose one)',ja:'ソース（1つ）'}, choices:[
+  {id:'red', zh:'紅醬', en:'Tomato sauce', ja:'トマトソース', price:0},
+  {id:'pesto', zh:'青醬', en:'Pesto', ja:'バジルペースト', price:0},
+  {id:'white', zh:'白醬', en:'Cream sauce', ja:'クリームソース', price:0},
+  {id:'dry', zh:'清炒', en:'Dry-fried (no sauce)', ja:'オイル炒め（ソースなし）', price:0},
+]};
+const NOODLE_GROUP = {id:'noodle', required:true, label:{zh:'麵體（擇一，選清炒不能選燉飯）',en:'Noodle (choose one; risotto unavailable with dry-fried)',ja:'麺（1つ、オイル炒めの場合リゾット不可）'}, get choices(){
+  const base = [
+    {id:'fettuccine', zh:'寬扁麵', en:'Fettuccine (flat noodle)', ja:'フェットチーネ（平打ち麺）', price:0},
+    {id:'spaghetti', zh:'圓直麵', en:'Spaghetti (round noodle)', ja:'スパゲッティ（丸麺）', price:0},
+    {id:'risotto', zh:'燉飯', en:'Risotto', ja:'リゾット', price:0},
+  ];
+  const sauceSel = modSelections['sauce'];
+  if(sauceSel && sauceSel.choice.id === 'dry'){
+    return base.filter(c=>c.id!=='risotto');
+  }
+  return base;
+}};
+const SPICE_GROUP = {id:'spice', required:true, label:{zh:'風味（擇一）',en:'Spice level (choose one)',ja:'味の濃さ（1つ）'}, choices:[
+  {id:'spicy', zh:'辣', en:'Spicy', ja:'辛口', price:0},
+  {id:'mild', zh:'不辣', en:'Not spicy', ja:'辛くない', price:0},
+]};
+
+const SET_A_SALAD_BREAD_GROUP = {id:'setASaladBread', required:false, defaultId:'none', label:{zh:'A套餐雜糧麵包升級（可選）',en:'Set A bread upgrade (optional)',ja:'セットAのパンのアップグレード（任意）'}, choices:BREAD_UPGRADE_CHOICES};
+const SET_UPGRADE_GROUP_SALAD = {id:'setUpgrade', required:false, defaultId:'none', label:{zh:'升級套餐（可選）',en:'Upgrade to a set (optional)',ja:'セットへのアップグレード（任意）'}, choices:[
+  {id:'none', zh:'不升級套餐', en:'No set upgrade', ja:'セットアップグレードなし', price:0},
+  {id:'setA', zh:'升級 A 套餐（玉米濃湯＋雜糧麵包×2＋套餐茶飲）', en:'Upgrade to Set A (corn chowder + multigrain bread ×2 + set tea)', ja:'セットAにアップグレード（コーンチャウダー＋雑穀パン×2＋セットドリンク）', price:119, subGroups:[SET_A_SALAD_BREAD_GROUP, DRINK_GROUP]},
+  {id:'setB', zh:'升級 B 套餐（玉米濃湯＋手作甜點＋套餐茶飲）', en:'Upgrade to Set B (corn chowder + handmade dessert + set tea)', ja:'セットBにアップグレード（コーンチャウダー＋手作りデザート＋セットドリンク）', price:159, subGroups:[DRINK_GROUP]},
+]};
+
+/* =========================================================
+   MODIFIER GROUP RESOLUTION
+   ========================================================= */
+function getTopLevelGroups(item){
+  if(item.cat === 'drinks'){
+    return DRINK_SUBGROUPS[item.subGroupsKey || 'none'];
+  }
+  const groups = [];
+  if(item.eggChoice){
+    const variant = item.eggVariant || (item.eggDouble ? 'double' : 'single');
+    const map = {double:EGG_GROUP_DOUBLE, single:EGG_GROUP_SINGLE, basic:EGG_GROUP_TOAST};
+    groups.push(map[variant]);
+  }
+  if(item.hasSalad) groups.push(DRESSING_GROUP);
+  if(item.breadUpgrade) groups.push(BREAD_GROUP);
+  if(item.extraButter) groups.push(BUTTER_GROUP);
+  if(item.pastaFull) groups.push(SAUCE_GROUP, NOODLE_GROUP, SPICE_GROUP);
+  if(item.pastaNoodleSpice) groups.push(NOODLE_GROUP, SPICE_GROUP);
+  if(item.kidsDrink) groups.push(KIDS_DRINK_GROUP);
+  if(item.setUpgradeAvailable) groups.push(item.setUpgradeVariant === 'salad' ? SET_UPGRADE_GROUP_SALAD : SET_UPGRADE_GROUP);
+  if(item.drinkCombo) groups.push(DRINK_GROUP);
+  return groups;
+}
+function expandGroups(topGroups, sel){
+  const result = [];
+  function walk(list){
+    list.forEach(g=>{
+      result.push(g);
+      const s = sel[g.id];
+      if(s && s.choice && s.choice.subGroups && s.choice.subGroups.length){
+        walk(s.choice.subGroups);
+      }
+    });
+  }
+  walk(topGroups);
+  return result;
+}
+function getItemModGroups(item, sel){
+  return expandGroups(getTopLevelGroups(item), sel || {});
+}
+
+/* =========================================================
+   TRANSLATIONS
+   ========================================================= */
+const T = {
+  en:{
+    brandSub:'Tap a language, build your order',
+    reviewBtn:'Review order',
+    sheetTitle:'Your order',
+    sheetTotalLabel:'Total',
+    confirmBtn:'Send order to kitchen',
+    closeLink:'Keep editing',
+    empty:'No items yet — add something from the menu.',
+    items:(n)=> n===1 ? '1 item' : n+' items',
+    add:'Add',
+    remove:'Remove',
+    notePlaceholder:'Note (e.g. no onions, extra spicy)',
+    noteTicketPrefix:'備註：',
+    ticketSub:'Customer language: English',
+    ticketFoot:'This ticket is for staff use — hand to the kitchen.',
+    newOrderBtn:'Start a new order',
+    selectOptions:'Select options',
+    modCancel:'Cancel',
+    modAdd:(price)=>'Add to cart · NT$'+price,
+    modChooseFirst:'Choose an option above',
+    priceTbd:'Price TBD',
+    priceTbdBtn:'Price not set yet',
+    required:'* Required',
+  },
+  ja:{
+    brandSub:'言語を選んでご注文ください',
+    reviewBtn:'注文を確認',
+    sheetTitle:'ご注文内容',
+    sheetTotalLabel:'合計',
+    confirmBtn:'注文を送信する',
+    closeLink:'注文を続ける',
+    empty:'まだ商品がありません。メニューから選んでください。',
+    items:(n)=> n+'点',
+    add:'追加',
+    remove:'削除',
+    notePlaceholder:'備考（例：玉ねぎ抜き、辛さ増し）',
+    noteTicketPrefix:'備註：',
+    ticketSub:'お客様の言語：日本語',
+    ticketFoot:'このチケットはスタッフ用です。厨房にお渡しください。',
+    newOrderBtn:'新しい注文を始める',
+    selectOptions:'オプションを選ぶ',
+    modCancel:'キャンセル',
+    modAdd:(price)=>'カートに追加 · NT$'+price,
+    modChooseFirst:'上のオプションを選んでください',
+    priceTbd:'価格未定',
+    priceTbdBtn:'価格未設定',
+    required:'※必須',
+  }
+};
+
+/* =========================================================
+   STATE
+   ========================================================= */
+let lang = 'en';
+let activeCat = 'platters';
+let cart = []; // array of {lineId, itemId, qty, mods, note}
+let lineCounter = 0;
+let ticketCounter = 42;
+
+let modItem = null;
+let modSelections = {}; // groupId -> {choice}
+let modQty = 1;
+
+/* =========================================================
+   RENDER: header / tabs / grid
+   ========================================================= */
+function setLang(l){
+  lang = l;
+  document.body.className = 'lang-' + l;
+  document.getElementById('btnEn').classList.toggle('active', l==='en');
+  document.getElementById('btnJa').classList.toggle('active', l==='ja');
+  renderAll();
+}
+
+function renderTabs(){
+  const t = document.getElementById('tabs');
+  t.innerHTML = '';
+  CATS.forEach(c=>{
+    const b = document.createElement('button');
+    b.textContent = c[lang];
+    b.className = c.id === activeCat ? 'active' : '';
+    b.onclick = ()=>{ activeCat = c.id; renderAll(); };
+    t.appendChild(b);
+  });
+}
+
+function findSimpleLine(itemId){
+  return cart.find(l=>l.itemId===itemId && !l.mods);
+}
+
+function renderGrid(){
+  const g = document.getElementById('grid');
+  g.innerHTML = '';
+  MENU.filter(m=>m.cat===activeCat).forEach(item=>{
+    const hasMods = getTopLevelGroups(item).length > 0;
+    const priceSet = typeof item.price === 'number';
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="stamp zh">${item.zh[0]}</div>
+      <p class="card-name">${item[lang]}</p>
+      <p class="card-ingredients">${item.ing[lang].join(' · ')}</p>
+      ${item.note ? `<p class="card-note">${item.note[lang]}</p>` : ''}
+      <p class="card-price">${priceSet ? 'NT$'+item.price : T[lang].priceTbd}</p>
+      <div class="qty-row" id="qtyrow-${item.id}"></div>
+    `;
+    g.appendChild(card);
+    const row = document.getElementById('qtyrow-'+item.id);
+    if(!priceSet){
+      row.innerHTML = `<span></span><button class="add-btn" disabled style="background:var(--line);color:var(--stone);cursor:not-allowed;">${T[lang].priceTbdBtn}</button>`;
+    } else if(hasMods){
+      row.innerHTML = `<span></span><button class="select-opts-btn" onclick="openModSheet(${item.id})">${T[lang].selectOptions}</button>`;
+    } else {
+      const line = findSimpleLine(item.id);
+      renderQtyRow(item.id, line ? line.qty : 0);
+    }
+  });
+}
+
+function renderQtyRow(id, qty){
+  const row = document.getElementById('qtyrow-'+id);
+  if(!row) return;
+  if(qty === 0){
+    row.innerHTML = `<span></span><button class="add-btn" onclick="changeQty(${id},1)">${T[lang].add}</button>`;
+  } else {
+    row.innerHTML = `
+      <span></span>
+      <div class="stepper">
+        <button onclick="changeQty(${id},-1)">−</button>
+        <span>${qty}</span>
+        <button onclick="changeQty(${id},1)">+</button>
+      </div>`;
+  }
+}
+
+function changeQty(itemId, delta){
+  let line = findSimpleLine(itemId);
+  if(!line && delta>0){
+    lineCounter += 1;
+    line = {lineId:lineCounter, itemId, qty:0, mods:null, note:''};
+    cart.push(line);
+  }
+  if(line){
+    line.qty += delta;
+    if(line.qty <= 0) cart = cart.filter(l=>l.lineId!==line.lineId);
+  }
+  renderGrid();
+  renderCartBar();
+}
+
+/* =========================================================
+   CART MATH
+   ========================================================= */
+function cartEntries(){
+  return cart.map(line=>({line, item: MENU.find(m=>m.id===line.itemId)}));
+}
+
+function lineExtra(line, item){
+  if(!line.mods) return 0;
+  let extra = 0;
+  getItemModGroups(item, line.mods).forEach(g=>{
+    const sel = line.mods[g.id];
+    if(sel) extra += sel.choice.price || 0;
+  });
+  return extra;
+}
+
+function lineUnitPrice(line, item){
+  return item.price + lineExtra(line, item);
+}
+
+function cartTotal(){
+  return cartEntries().reduce((sum,e)=>sum + lineUnitPrice(e.line, e.item)*e.line.qty, 0);
+}
+
+function cartCount(){
+  return cart.reduce((sum,l)=>sum+l.qty, 0);
+}
+
+function renderCartBar(){
+  const bar = document.getElementById('cartbar');
+  const n = cartCount();
+  bar.classList.toggle('show', n>0);
+  document.getElementById('cartInfo').textContent = T[lang].items(n);
+  document.getElementById('cartTotal').textContent = 'NT$'+cartTotal();
+  document.getElementById('reviewBtn').textContent = T[lang].reviewBtn;
+}
+
+function renderStaticText(){
+  document.getElementById('brandSub').textContent = T[lang].brandSub;
+  document.getElementById('sheetTitle').textContent = T[lang].sheetTitle;
+  document.getElementById('sheetTotalLabel').textContent = T[lang].sheetTotalLabel;
+  document.getElementById('confirmBtn').textContent = T[lang].confirmBtn;
+  document.getElementById('closeLink').textContent = T[lang].closeLink;
+  document.getElementById('modCloseLink').textContent = T[lang].modCancel;
+}
+
+function renderAll(){
+  renderTabs();
+  renderGrid();
+  renderCartBar();
+  renderStaticText();
+}
+
+/* =========================================================
+   MODIFIER SHEET
+   ========================================================= */
+function openModSheet(itemId){
+  modItem = MENU.find(m=>m.id===itemId);
+  modSelections = {};
+  modQty = 1;
+  document.getElementById('modQtyVal').textContent = modQty;
+  document.getElementById('modSheetTitle').textContent = modItem[lang];
+  renderModGroups();
+  document.getElementById('modOverlay').classList.add('show');
+}
+
+function closeModSheet(){
+  document.getElementById('modOverlay').classList.remove('show');
+}
+function closeModSheetBg(e){
+  if(e.target.id === 'modOverlay') closeModSheet();
+}
+
+function pruneModSelections(){
+  const validIds = new Set(getItemModGroups(modItem, modSelections).map(g=>g.id));
+  Object.keys(modSelections).forEach(id=>{
+    if(!validIds.has(id)) delete modSelections[id];
+  });
+}
+
+function renderModGroups(){
+  const wrap = document.getElementById('modGroups');
+  wrap.innerHTML = '';
+  const topIds = new Set(getTopLevelGroups(modItem).map(g=>g.id));
+  const groups = getItemModGroups(modItem, modSelections);
+
+  groups.forEach(g=>{
+    let sel = modSelections[g.id];
+    if(!sel && g.defaultId){
+      sel = {choice: g.choices.find(c=>c.id===g.defaultId)};
+      modSelections[g.id] = sel;
+    }
+    const isNested = !topIds.has(g.id);
+    const container = document.createElement('div');
+    container.className = isNested ? 'opt-sub' : 'opt-group';
+    let html = `<div class="opt-group-label">${g.label[lang]}</div>`;
+    if(g.required){
+      html += `<div class="opt-group-required">${T[lang].required}</div>`;
+    }
+    g.choices.forEach(c=>{
+      const checked = sel && sel.choice.id===c.id ? 'checked' : '';
+      const priceLabel = c.price ? ` (+NT$${c.price})` : '';
+      html += `
+        <label class="opt-choice">
+          <input type="radio" name="group-${g.id}" ${checked} onchange="selectModChoice('${g.id}','${c.id}')">
+          <span class="opt-name">${c[lang]}</span>
+          <span class="opt-price">${priceLabel}</span>
+        </label>`;
+    });
+    container.innerHTML = html;
+    wrap.appendChild(container);
+  });
+
+  updateModAddBtnState();
+}
+
+function revalidateModSelections(){
+  // drop selections that are no longer among their (possibly dynamic) group's current choices
+  const groups = getItemModGroups(modItem, modSelections);
+  groups.forEach(g=>{
+    const sel = modSelections[g.id];
+    if(sel && !g.choices.find(c=>c.id===sel.choice.id)){
+      delete modSelections[g.id];
+    }
+  });
+}
+
+function selectModChoice(groupId, choiceId){
+  const groups = getItemModGroups(modItem, modSelections);
+  const g = groups.find(x=>x.id===groupId);
+  const choice = g.choices.find(c=>c.id===choiceId);
+  modSelections[groupId] = {choice};
+  revalidateModSelections();
+  pruneModSelections();
+  renderModGroups();
+}
+
+function modGroupsFulfilled(){
+  return getItemModGroups(modItem, modSelections).every(g=>{
+    if(!g.required) return true;
+    return !!modSelections[g.id];
+  });
+}
+
+function modUnitPrice(){
+  let extra = 0;
+  getItemModGroups(modItem, modSelections).forEach(g=>{
+    const sel = modSelections[g.id];
+    if(sel) extra += sel.choice.price || 0;
+  });
+  return modItem.price + extra;
+}
+
+function updateModAddBtnState(){
+  const btn = document.getElementById('modAddBtn');
+  const ok = modGroupsFulfilled();
+  btn.disabled = !ok;
+  btn.textContent = ok ? T[lang].modAdd(modUnitPrice()*modQty) : T[lang].modChooseFirst;
+}
+
+function modQtyChange(delta){
+  modQty = Math.max(1, modQty + delta);
+  document.getElementById('modQtyVal').textContent = modQty;
+  updateModAddBtnState();
+}
+
+function confirmAddWithMods(){
+  if(!modGroupsFulfilled()) return;
+  lineCounter += 1;
+  cart.push({
+    lineId: lineCounter,
+    itemId: modItem.id,
+    qty: modQty,
+    mods: JSON.parse(JSON.stringify(modSelections)),
+    note: '',
+  });
+  closeModSheet();
+  renderGrid();
+  renderCartBar();
+}
+
+function modsSummary(item, mods, l){
+  if(!mods) return '';
+  const groups = getItemModGroups(item, mods);
+  const parts = [];
+  groups.forEach(g=>{
+    const sel = mods[g.id];
+    if(!sel) return;
+    if(g.defaultId && sel.choice.id === g.defaultId) return;
+    parts.push(sel.choice[l]);
+  });
+  return parts.join('，');
+}
+
+/* =========================================================
+   REVIEW SHEET
+   ========================================================= */
+function openSheet(){
+  const wrap = document.getElementById('sheetItems');
+  wrap.innerHTML = '';
+  const entries = cartEntries();
+  if(entries.length === 0){
+    wrap.innerHTML = `<p class="empty-note">${T[lang].empty}</p>`;
+  } else {
+    entries.forEach(e=>{
+      const summary = modsSummary(e.item, e.line.mods, lang);
+      const unit = lineUnitPrice(e.line, e.item);
+      const block = document.createElement('div');
+      block.className = 'line-item-block';
+      block.innerHTML = `
+        <div class="line-item">
+          <span class="name">${e.item[lang]}${summary ? ' — '+summary : ''} ×${e.line.qty}</span>
+          <span>NT$${unit*e.line.qty}</span>
+          <button class="remove" onclick="removeItem(${e.line.lineId})">${T[lang].remove}</button>
+        </div>
+        <input class="note-input" type="text" placeholder="${T[lang].notePlaceholder}"
+          value="${(e.line.note||'').replace(/"/g,'&quot;')}"
+          oninput="updateLineNote(${e.line.lineId}, this.value)">
+      `;
+      wrap.appendChild(block);
+    });
+  }
+  document.getElementById('sheetTotalValue').textContent = 'NT$'+cartTotal();
+  document.getElementById('confirmBtn').style.display = entries.length ? 'block' : 'none';
+  document.getElementById('overlay').classList.add('show');
+}
+
+function updateLineNote(lineId, val){
+  const line = cart.find(l=>l.lineId===lineId);
+  if(line) line.note = val;
+}
+
+function removeItem(lineId){
+  cart = cart.filter(l=>l.lineId!==lineId);
+  renderGrid();
+  renderCartBar();
+  openSheet();
+}
+
+function closeSheet(){
+  document.getElementById('overlay').classList.remove('show');
+}
+function closeSheetBg(e){
+  if(e.target.id === 'overlay') closeSheet();
+}
+
+/* =========================================================
+   TICKET
+   ========================================================= */
+function submitOrder(){
+  const entries = cartEntries();
+  if(entries.length === 0) return;
+  ticketCounter += 1;
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit'});
+
+  document.getElementById('ticketSub').textContent =
+    T[lang].ticketSub + ' · #' + ticketCounter + ' · ' + timeStr;
+
+  const itemsWrap = document.getElementById('ticketItems');
+  itemsWrap.innerHTML = '';
+  entries.forEach(e=>{
+    const summary = modsSummary(e.item, e.line.mods, 'zh');
+    const unit = lineUnitPrice(e.line, e.item);
+    const row = document.createElement('div');
+    row.className = 'ticket-row';
+    row.innerHTML = `
+      <span class="zh">${e.item.zh}${summary ? '（'+summary+'）' : ''} ×${e.line.qty}</span>
+      <span>NT$${unit*e.line.qty}</span>
+    `;
+    itemsWrap.appendChild(row);
+    const note = (e.line.note||'').trim();
+    if(note){
+      const noteRow = document.createElement('div');
+      noteRow.className = 'ticket-note';
+      noteRow.textContent = T[lang].noteTicketPrefix + note;
+      itemsWrap.appendChild(noteRow);
+    }
+  });
+  document.getElementById('ticketTotal').textContent = 'NT$'+cartTotal();
+  document.getElementById('ticketFoot').textContent = T[lang].ticketFoot;
+
+  closeSheet();
+  document.getElementById('ticketWrap').classList.add('show');
+}
+
+function resetOrder(){
+  cart = [];
+  document.getElementById('ticketWrap').classList.remove('show');
+  document.getElementById('newOrderBtn').textContent = T[lang].newOrderBtn;
+  renderAll();
+}
+
+// init
+document.body.className = 'lang-en';
+renderAll();
+</script>
+</body>
+</html>
