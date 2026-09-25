@@ -492,6 +492,14 @@ header{
 <div class="tabs" id="tabs"></div>
 <div class="grid" id="grid"></div>
 
+<div class="overlay" id="welcomeOverlay">
+  <div class="sheet">
+    <h2 id="welcomeTitle">How to order</h2>
+    <p id="welcomeBody" style="font-size:14px; line-height:1.7; color:var(--ink); margin:0 0 18px;">After you finish choosing your items and tap "Send order to kitchen," please bring this screen to the counter to complete your order and pay.</p>
+    <button class="confirm-btn" id="welcomeOkBtn" onclick="closeWelcome()">Got it</button>
+  </div>
+</div>
+
 <div class="cartbar" id="cartbar">
   <div>
     <div class="info" id="cartInfo">0 items</div>
@@ -830,6 +838,62 @@ const MENU = [
   {id:96, cat:'chef-special', zh:'自製義式肉醬', en:'自製義式肉醬', ja:'自製義式肉醬', price:280,
     drinkCombo:true, breadUpgrade:true,
     ing:{zh:['義式肉醬','義大利麵'],en:['Italian meat sauce','Spaghetti'],ja:['イタリアンミートソース','スパゲッティ']}},
+
+  // ---------- more drinks ----------
+  {id:110, cat:'drinks', zh:'奇異果C多', en:'Kiwi Yakult', ja:'キウイヤクルト', price:140,
+    subGroupsKey:'none',
+    note:{zh:'甜度及冰塊固定', en:'Sweetness and ice level are fixed', ja:'甘さ・氷の量は固定です'},
+    ing:{zh:['奇異果','養樂多'],en:['Kiwi','Yakult'],ja:['キウイ','ヤクルト']}},
+  {id:111, cat:'drinks', zh:'新鮮酪梨牛奶', en:'Fresh Avocado Milk', ja:'フレッシュアボカドミルク', price:160,
+    subGroupsKey:'none',
+    note:{zh:'甜度及冰塊固定', en:'Sweetness and ice level are fixed', ja:'甘さ・氷の量は固定です'},
+    ing:{zh:['酪梨','鮮奶','蜂蜜'],en:['Avocado','Fresh milk','Honey'],ja:['アボカド','牛乳','はちみつ']}},
+  {id:112, cat:'drinks', zh:'美麗多多氣泡飲', en:'Lychee Yakult Sparkler', ja:'ライチヤクルトスパークラー', price:140,
+    subGroupsKey:'none',
+    note:{zh:'甜度及冰塊固定', en:'Sweetness and ice level are fixed', ja:'甘さ・氷の量は固定です'},
+    ing:{zh:['荔枝果醋','玫瑰糖漿','養樂多','氣泡水'],en:['Lychee vinegar','Rose syrup','Yakult','Sparkling water'],ja:['ライチビネガー','ローズシロップ','ヤクルト','炭酸水']}},
+  {id:113, cat:'drinks', zh:'藍橙夏日氣泡飲', en:'Blue Orange Summer Sparkler', ja:'ブルーオレンジサマースパークラー', price:140,
+    subGroupsKey:'none',
+    note:{zh:'甜度及冰塊固定', en:'Sweetness and ice level are fixed', ja:'甘さ・氷の量は固定です'},
+    ing:{zh:['柳橙汁','藍橙糖漿','可爾必思','氣泡水'],en:['Orange juice','Blue orange syrup','Calpis','Sparkling water'],ja:['オレンジジュース','ブルーオレンジシロップ','カルピス','炭酸水']}},
+  {id:114, cat:'drinks', zh:'西西里氣泡咖啡', en:'Sicilian Sparkling Coffee', ja:'シチリアーノスパークリングコーヒー', price:160,
+    subGroupsKey:'none',
+    note:{zh:'甜度及冰塊固定', en:'Sweetness and ice level are fixed', ja:'甘さ・氷の量は固定です'},
+    ing:{zh:['檸檬汁','濃縮咖啡','蜂蜜','氣泡水'],en:['Lemon juice','Espresso','Honey','Sparkling water'],ja:['レモン果汁','エスプレッソ','はちみつ','炭酸水']}},
+  {id:115, cat:'drinks', zh:'熱帶水果氣泡飲', en:'Tropical Fruit Sparkler', ja:'トロピカルフルーツスパークラー', price:160,
+    subGroupsKey:'none',
+    note:{zh:'甜度及冰塊固定', en:'Sweetness and ice level are fixed', ja:'甘さ・氷の量は固定です'},
+    ing:{zh:['蘋果','柳橙','奇異果','熱帶水果醬','氣泡水'],en:['Apple','Orange','Kiwi','Tropical fruit sauce','Sparkling water'],ja:['りんご','オレンジ','キウイ','トロピカルフルーツソース','炭酸水']}},
+  {id:116, cat:'drinks', zh:'火龍果蘋果汁', en:'Dragon Fruit Apple Juice', ja:'ドラゴンフルーツアップルジュース', price:150,
+    subGroupsKey:'none',
+    note:{zh:'甜度及冰塊固定', en:'Sweetness and ice level are fixed', ja:'甘さ・氷の量は固定です'},
+    ing:{zh:['火龍果','蘋果'],en:['Dragon fruit','Apple'],ja:['ドラゴンフルーツ','りんご']}},
+  {id:117, cat:'drinks', zh:'就是牛奶', en:'Just Milk', ja:'ミルクだけ', price:80,
+    subGroupsKey:'tempOnly',
+    ing:{zh:['鮮乳'],en:['Fresh milk'],ja:['牛乳']}},
+
+  // ---------- dessert ----------
+  {id:120, cat:'dessert', zh:'藍莓生乳酪', en:'Blueberry Raw Cheesecake', ja:'ブルーベリーレアチーズケーキ', price:150,
+    dessertTiming:'full',
+    ing:{zh:['藍莓生乳酪'],en:['Blueberry raw cheesecake'],ja:['ブルーベリーレアチーズケーキ']}},
+  {id:121, cat:'dessert', zh:'巴斯克乳酪蛋糕', en:'Basque Cheesecake', ja:'バスクチーズケーキ', price:140,
+    dessertTiming:'full', iceCreamAddon:true,
+    ing:{zh:['巴斯克乳酪蛋糕'],en:['Basque cheesecake'],ja:['バスクチーズケーキ']}},
+  {id:122, cat:'dessert', zh:'經典核桃布朗尼', en:'Classic Walnut Brownie', ja:'クラシックウォールナッツブラウニー', price:140,
+    dessertTiming:'full', iceCreamAddon:true,
+    ing:{zh:['經典核桃布朗尼'],en:['Classic walnut brownie'],ja:['クラシックウォールナッツブラウニー']}},
+  {id:123, cat:'dessert', zh:'炙燒巴斯克蛋糕', en:'Torched Basque Cheesecake', ja:'炙り焼きバスクチーズケーキ', price:150,
+    dessertTiming:'full',
+    ing:{zh:['炙燒巴斯克蛋糕'],en:['Torched Basque cheesecake'],ja:['炙り焼きバスクチーズケーキ']}},
+  {id:124, cat:'dessert', zh:'法芙娜可可巴斯克蛋糕', en:'Valrhona Cocoa Basque Cheesecake', ja:'ヴァローナカカオバスクチーズケーキ', price:150,
+    dessertTiming:'full',
+    ing:{zh:['法芙娜可可巴斯克蛋糕'],en:['Valrhona cocoa Basque cheesecake'],ja:['ヴァローナカカオバスクチーズケーキ']}},
+  {id:125, cat:'dessert', zh:'杜拜巧克力巴斯克蛋糕', en:'Dubai Chocolate Basque Cheesecake', ja:'ドバイチョコレートバスクチーズケーキ', price:220,
+    dessertTiming:'full',
+    ing:{zh:['杜拜巧克力巴斯克蛋糕'],en:['Dubai chocolate Basque cheesecake'],ja:['ドバイチョコレートバスクチーズケーキ']}},
+  {id:126, cat:'dessert', zh:'杜拜巧克力布朗尼', en:'Dubai Chocolate Brownie', ja:'ドバイチョコレートブラウニー', price:180,
+    dessertTiming:'noTakeaway',
+    ing:{zh:['杜拜巧克力布朗尼'],en:['Dubai chocolate brownie'],ja:['ドバイチョコレートブラウニー']}},
 ];
 
 
@@ -847,6 +911,7 @@ const CATS = [
   {id:'pasta-risotto', en:'Pasta / Risotto', ja:'パスタ・リゾット'},
   {id:'chef-special', en:"Chef's Special", ja:'シェフのおすすめ'},
   {id:'drinks', en:'Drinks', ja:'ドリンク'},
+  {id:'dessert', en:'Dessert', ja:'デザート'},
 ];
 
 /* =========================================================
@@ -939,10 +1004,23 @@ const DRINK_GROUP = {
   get choices(){ return buildDrinkChoices(); },
 };
 
+function buildDessertChoices(){
+  return MENU.filter(m=>m.cat==='dessert').map(d=>({
+    id:'dessert-'+d.id, zh:d.zh, en:d.en, ja:d.ja,
+    price: Math.max(0, d.price - 140),
+    subGroups: getTopLevelGroups(d),
+  }));
+}
+const DESSERT_GROUP = {
+  id:'dessertPick', required:true,
+  label:{zh:'手作甜點（擇一，超過NT$140需補差額）', en:'Handmade dessert (choose one; price difference applies above NT$140)', ja:'手作りデザート（1つ、140元を超える場合は差額）'},
+  get choices(){ return buildDessertChoices(); },
+};
+
 const SET_UPGRADE_GROUP = {id:'setUpgrade', required:false, defaultId:'none', label:{zh:'升級套餐（可選）',en:'Upgrade to a set (optional)',ja:'セットへのアップグレード（任意）'}, choices:[
   {id:'none', zh:'不升級套餐', en:'No set upgrade', ja:'セットアップグレードなし', price:0},
   {id:'setA', zh:'升級 A 套餐（薯條或雞塊＋沙拉或優格＋套餐茶飲）', en:'Upgrade to Set A (fries or nuggets + salad or yogurt + set tea)', ja:'セットAにアップグレード（フライドポテトorナゲット＋サラダorヨーグルト＋セットドリンク）', price:119, subGroups:[SET_A_SIDE_GROUP, SET_A_SALAD_GROUP, DRINK_GROUP]},
-  {id:'setB', zh:'升級 B 套餐（玉米濃湯＋手作甜點＋套餐茶飲）', en:'Upgrade to Set B (corn chowder + handmade dessert + set tea)', ja:'セットBにアップグレード（コーンチャウダー＋手作りデザート＋セットドリンク）', price:159, subGroups:[DRINK_GROUP]},
+  {id:'setB', zh:'升級 B 套餐（玉米濃湯＋手作甜點＋套餐茶飲）', en:'Upgrade to Set B (corn chowder + handmade dessert + set tea)', ja:'セットBにアップグレード（コーンチャウダー＋手作りデザート＋セットドリンク）', price:159, subGroups:[DESSERT_GROUP, DRINK_GROUP]},
 ]};
 
 const EGG_GROUP_TOAST = {id:'egg', required:true, label:{zh:'蛋的熟度',en:'Egg style',ja:'卵の焼き加減'}, choices:[
@@ -982,7 +1060,21 @@ const SET_A_SALAD_BREAD_GROUP = {id:'setASaladBread', required:false, defaultId:
 const SET_UPGRADE_GROUP_SALAD = {id:'setUpgrade', required:false, defaultId:'none', label:{zh:'升級套餐（可選）',en:'Upgrade to a set (optional)',ja:'セットへのアップグレード（任意）'}, choices:[
   {id:'none', zh:'不升級套餐', en:'No set upgrade', ja:'セットアップグレードなし', price:0},
   {id:'setA', zh:'升級 A 套餐（玉米濃湯＋雜糧麵包×2＋套餐茶飲）', en:'Upgrade to Set A (corn chowder + multigrain bread ×2 + set tea)', ja:'セットAにアップグレード（コーンチャウダー＋雑穀パン×2＋セットドリンク）', price:119, subGroups:[SET_A_SALAD_BREAD_GROUP, DRINK_GROUP]},
-  {id:'setB', zh:'升級 B 套餐（玉米濃湯＋手作甜點＋套餐茶飲）', en:'Upgrade to Set B (corn chowder + handmade dessert + set tea)', ja:'セットBにアップグレード（コーンチャウダー＋手作りデザート＋セットドリンク）', price:159, subGroups:[DRINK_GROUP]},
+  {id:'setB', zh:'升級 B 套餐（玉米濃湯＋手作甜點＋套餐茶飲）', en:'Upgrade to Set B (corn chowder + handmade dessert + set tea)', ja:'セットBにアップグレード（コーンチャウダー＋手作りデザート＋セットドリンク）', price:159, subGroups:[DESSERT_GROUP, DRINK_GROUP]},
+]};
+
+const SERVE_TIMING_FULL = {id:'serveTiming', required:true, label:{zh:'出餐時間（擇一）',en:'Serving time (choose one)',ja:'提供タイミング（1つ）'}, choices:[
+  {id:'first', zh:'先上', en:'Serve first', ja:'先に提供', price:0},
+  {id:'after', zh:'餐後上', en:'Serve after the meal', ja:'食後に提供', price:0},
+  {id:'takeaway', zh:'外帶', en:'Takeaway', ja:'テイクアウト', price:0},
+]};
+const SERVE_TIMING_NO_TAKEAWAY = {id:'serveTiming', required:true, label:{zh:'出餐時間（擇一）',en:'Serving time (choose one)',ja:'提供タイミング（1つ）'}, choices:[
+  {id:'first', zh:'先上', en:'Serve first', ja:'先に提供', price:0},
+  {id:'after', zh:'餐後上', en:'Serve after the meal', ja:'食後に提供', price:0},
+]};
+const ICE_CREAM_ADDON_GROUP = {id:'iceCreamAddon', required:false, defaultId:'no', label:{zh:'加購香草冰淇淋（可選）',en:'Add vanilla ice cream (optional)',ja:'バニラアイス追加（任意）'}, choices:[
+  {id:'no', zh:'不加', en:'No', ja:'なし', price:0},
+  {id:'yes', zh:'加香草冰淇淋', en:'Add vanilla ice cream', ja:'バニラアイスを追加', price:10},
 ]};
 
 /* =========================================================
@@ -1004,6 +1096,8 @@ function getTopLevelGroups(item){
   if(item.pastaFull) groups.push(SAUCE_GROUP, NOODLE_GROUP, SPICE_GROUP);
   if(item.pastaNoodleSpice) groups.push(NOODLE_GROUP, SPICE_GROUP);
   if(item.kidsDrink) groups.push(KIDS_DRINK_GROUP);
+  if(item.dessertTiming) groups.push(item.dessertTiming === 'noTakeaway' ? SERVE_TIMING_NO_TAKEAWAY : SERVE_TIMING_FULL);
+  if(item.iceCreamAddon) groups.push(ICE_CREAM_ADDON_GROUP);
   if(item.setUpgradeAvailable) groups.push(item.setUpgradeVariant === 'salad' ? SET_UPGRADE_GROUP_SALAD : SET_UPGRADE_GROUP);
   if(item.drinkCombo) groups.push(DRINK_GROUP);
   return groups;
@@ -1053,6 +1147,9 @@ const T = {
     priceTbd:'Price TBD',
     priceTbdBtn:'Price not set yet',
     required:'* Required',
+    welcomeTitle:'How to order',
+    welcomeBody:'After you finish choosing your items and tap "Send order to kitchen," please bring this screen to the counter to complete your order and pay.',
+    welcomeOk:'Got it',
   },
   ja:{
     brandSub:'言語を選んでご注文ください',
@@ -1077,6 +1174,9 @@ const T = {
     priceTbd:'価格未定',
     priceTbdBtn:'価格未設定',
     required:'※必須',
+    welcomeTitle:'ご注文方法',
+    welcomeBody:'商品を選んで「注文を送信する」をタップした後、この画面をレジまでお持ちいただき、お会計をお済ませください。',
+    welcomeOk:'わかりました',
   }
 };
 
@@ -1225,6 +1325,13 @@ function renderStaticText(){
   document.getElementById('confirmBtn').textContent = T[lang].confirmBtn;
   document.getElementById('closeLink').textContent = T[lang].closeLink;
   document.getElementById('modCloseLink').textContent = T[lang].modCancel;
+  document.getElementById('welcomeTitle').textContent = T[lang].welcomeTitle;
+  document.getElementById('welcomeBody').textContent = T[lang].welcomeBody;
+  document.getElementById('welcomeOkBtn').textContent = T[lang].welcomeOk;
+}
+
+function closeWelcome(){
+  document.getElementById('welcomeOverlay').classList.remove('show');
 }
 
 function renderAll(){
@@ -1477,6 +1584,7 @@ function resetOrder(){
 // init
 document.body.className = 'lang-en';
 renderAll();
+document.getElementById('welcomeOverlay').classList.add('show');
 </script>
 </body>
 </html>
