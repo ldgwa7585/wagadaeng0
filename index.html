@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Genki Diner — Order</title>
+<title>Wagada — Order</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Noto+Serif+JP:wght@500;700&family=Noto+Sans+JP:wght@400;600&family=Noto+Serif+TC:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
 
@@ -620,6 +620,7 @@ const MENU = [
          ja:['エッグサラダ','コーン','くるみ','ハニーマスタード','ミックスグリーンズ','ハム']}},
   {id:32, cat:'danish-sandwich', zh:'青醬舒肥雞肉丹麥', en:'青醬舒肥雞肉丹麥', ja:'青醬舒肥雞肉丹麥', price:160,
     setUpgradeAvailable:true,
+    note:{zh:'含花生（青醬）', en:'Contains peanuts (pesto)', ja:'ピーナッツを含みます（バジルペースト）'},
     ing:{zh:['美乃滋','太陽蛋','青醬','雞胸肉','綜合生菜'],
          en:['Mayonnaise','Sunny-side-up egg','Pesto','Chicken breast','Mixed greens'],
          ja:['マヨネーズ','目玉焼き','バジルペースト','鶏むね肉','ミックスグリーンズ']}},
@@ -635,16 +636,19 @@ const MENU = [
          ja:['わさびソース','チーズ','トマトスライス','ハニーマスタード','玉ねぎ','牛バラ肉のソテー']}},
   {id:35, cat:'danish-sandwich', zh:'綜合起司炒蛋丹麥', en:'綜合起司炒蛋丹麥', ja:'綜合起司炒蛋丹麥', price:120,
     setUpgradeAvailable:true,
+    note:{zh:'蛋奶素', en:'Vegetarian (lacto-ovo)', ja:'卵・乳製品可のベジタリアン'},
     ing:{zh:['美乃滋','莫札瑞拉起司','羅勒炒嫩蛋','黑胡椒','起司'],
          en:['Mayonnaise','Mozzarella cheese','Soft scrambled egg with basil','Black pepper','Cheese'],
          ja:['マヨネーズ','モッツァレラチーズ','バジル入りとろとろスクランブルエッグ','黒胡椒','チーズ']}},
   {id:36, cat:'danish-sandwich', zh:'堅果起司丹麥', en:'堅果起司丹麥', ja:'堅果起司丹麥', price:110,
     setUpgradeAvailable:true,
+    note:{zh:'蛋奶素', en:'Vegetarian (lacto-ovo)', ja:'卵・乳製品可のベジタリアン'},
     ing:{zh:['美乃滋','莫札瑞拉起司','核桃','蜂蜜','起司','羅勒','花生醬'],
          en:['Mayonnaise','Mozzarella cheese','Walnuts','Honey','Cheese','Basil','Peanut butter'],
          ja:['マヨネーズ','モッツァレラチーズ','くるみ','はちみつ','チーズ','バジル','ピーナッツバター']}},
   {id:37, cat:'danish-sandwich', zh:'酪梨核桃丹麥', en:'酪梨核桃丹麥', ja:'酪梨核桃丹麥', price:160,
     setUpgradeAvailable:true,
+    note:{zh:'蛋奶素', en:'Vegetarian (lacto-ovo)', ja:'卵・乳製品可のベジタリアン'},
     ing:{zh:['蛋沙拉','酪梨','核桃','蜂蜜'],
          en:['Egg salad','Avocado','Walnuts','Honey'],
          ja:['エッグサラダ','アボカド','くるみ','はちみつ']}},
@@ -743,12 +747,15 @@ const MENU = [
   // ---------- french toast ----------
   {id:50, cat:'french-toast', zh:'原味楓糖', en:'原味楓糖', ja:'原味楓糖', price:100,
     setUpgradeAvailable:true,
+    note:{zh:'蛋奶素', en:'Vegetarian (lacto-ovo)', ja:'卵・乳製品可のベジタリアン'},
     ing:{zh:['丹麥法式吐司','糖粉','楓糖糖漿'],en:['Danish French toast','Powdered sugar','Maple syrup'],ja:['デニッシュフレンチトースト','粉砂糖','メープルシロップ']}},
   {id:51, cat:'french-toast', zh:'綜合莓果脆片', en:'綜合莓果脆片', ja:'綜合莓果脆片', price:130,
     setUpgradeAvailable:true,
+    note:{zh:'蛋奶素', en:'Vegetarian (lacto-ovo)', ja:'卵・乳製品可のベジタリアン'},
     ing:{zh:['丹麥法式吐司','玉米脆片','草莓','藍莓','糖粉','蜂蜜'],en:['Danish French toast','Corn flakes','Strawberry','Blueberry','Powdered sugar','Honey'],ja:['デニッシュフレンチトースト','コーンフレーク','いちご','ブルーベリー','粉砂糖','はちみつ']}},
   {id:52, cat:'french-toast', zh:'熔岩起司', en:'熔岩起司', ja:'熔岩起司', price:130,
     setUpgradeAvailable:true,
+    note:{zh:'蛋奶素', en:'Vegetarian (lacto-ovo)', ja:'卵・乳製品可のベジタリアン'},
     ing:{zh:['丹麥法式吐司','熔岩起司淋醬'],en:['Danish French toast','Lava cheddar cheese sauce'],ja:['デニッシュフレンチトースト','溶岩チェダーチーズソース']}},
   {id:53, cat:'french-toast', zh:'咬咬太陽', en:'咬咬太陽', ja:'咬咬太陽', price:150,
     setUpgradeAvailable:true, eggChoice:true, eggVariant:'basic',
@@ -760,6 +767,7 @@ const MENU = [
     ing:{zh:['綜合生菜','核桃','番茄','柳橙','舒肥雞胸','水煮蛋','起司'],en:['Mixed greens','Walnuts','Tomato','Orange','Sous-vide chicken breast','Boiled egg','Cheese'],ja:['ミックスグリーンズ','くるみ','トマト','オレンジ','低温調理チキンブレスト','ゆで卵','チーズ']}},
   {id:56, cat:'salad', zh:'密薯香甜蘿美沙拉', en:'密薯香甜蘿美沙拉', ja:'密薯香甜蘿美沙拉', price:180,
     hasSalad:true, setUpgradeAvailable:true, setUpgradeVariant:'salad',
+    note:{zh:'蛋奶素', en:'Vegetarian (lacto-ovo)', ja:'卵・乳製品可のベジタリアン'},
     ing:{zh:['綜合生菜','核桃','番茄','柳橙','自製地瓜泥','自製馬鈴薯泥','水煮蛋','起司'],en:['Mixed greens','Walnuts','Tomato','Orange','Homemade mashed sweet potato','Homemade mashed potatoes','Boiled egg','Cheese'],ja:['ミックスグリーンズ','くるみ','トマト','オレンジ','自家製さつまいもマッシュ','自家製マッシュポテト','ゆで卵','チーズ']}},
   {id:57, cat:'salad', zh:'溫暖牛菲香溫沙拉', en:'溫暖牛菲香溫沙拉', ja:'溫暖牛菲香溫沙拉', price:290,
     setUpgradeAvailable:true, setUpgradeVariant:'salad',
@@ -767,6 +775,7 @@ const MENU = [
     ing:{zh:['綜合生菜','番茄','柳橙','炙燒牛排','時蔬炒菇菇','起司'],en:['Mixed greens','Tomato','Orange','Seared steak','Sautéed seasonal vegetables & mushrooms','Cheese'],ja:['ミックスグリーンズ','トマト','オレンジ','炙り焼きステーキ','季節野菜ときのこのソテー','チーズ']}},
   {id:58, cat:'salad', zh:'法式酪梨田園沙拉', en:'法式酪梨田園沙拉', ja:'法式酪梨田園沙拉', price:290,
     hasSalad:true, setUpgradeAvailable:true, setUpgradeVariant:'salad',
+    note:{zh:'蛋奶素', en:'Vegetarian (lacto-ovo)', ja:'卵・乳製品可のベジタリアン'},
     ing:{zh:['綜合生菜','核桃','番茄','柳橙','酪梨','水煮蛋','起司'],en:['Mixed greens','Walnuts','Tomato','Orange','Avocado','Boiled egg','Cheese'],ja:['ミックスグリーンズ','くるみ','トマト','オレンジ','アボカド','ゆで卵','チーズ']}},
   {id:59, cat:'salad', zh:'北歐晨曦煙燻鮭魚沙拉', en:'北歐晨曦煙燻鮭魚沙拉', ja:'北歐晨曦煙燻鮭魚沙拉', price:290,
     hasSalad:true, setUpgradeAvailable:true, setUpgradeVariant:'salad',
@@ -794,6 +803,7 @@ const MENU = [
   {id:72, cat:'alacarte', zh:'熔岩起司脆薯', en:'熔岩起司脆薯', ja:'熔岩起司脆薯', price:150,
     ing:{zh:['炸薯條','熔岩起司淋醬','起司'],en:['French fries','Lava cheddar cheese sauce','Cheese'],ja:['フライドポテト','溶岩チェダーチーズソース','チーズ']}},
   {id:73, cat:'alacarte', zh:'煙燻鮭魚卷', en:'煙燻鮭魚卷', ja:'煙燻鮭魚卷', price:200,
+    note:{zh:'含花生（青醬）', en:'Contains peanuts (pesto)', ja:'ピーナッツを含みます（バジルペースト）'},
     ing:{zh:['冷燻鮭魚','魚卵芥末醬','生菜','青醬','奶油乳酪','蘋果'],en:['Cold-smoked salmon','Roe mustard sauce','Lettuce','Pesto','Cream cheese','Apple'],ja:['コールドスモークサーモン','魚卵マスタードソース','レタス','バジルペースト','クリームチーズ','りんご']}},
   {id:74, cat:'alacarte', zh:'炸類拼盤', en:'炸類拼盤', ja:'炸類拼盤', price:390,
     ing:{zh:['炸薯條','雞塊','雞柳條','洋蔥圈','紐奧良雞翅'],en:['French fries','Chicken nuggets','Chicken tenders','Onion rings','New Orleans chicken wings'],ja:['フライドポテト','チキンナゲット','チキンテンダー','オニオンリング','ニューオーリンズチキンウィング']}},
@@ -1035,7 +1045,7 @@ const KIDS_DRINK_GROUP = {id:'kidsDrink', required:true, label:{zh:'附餐飲料
 
 const SAUCE_GROUP = {id:'sauce', required:true, label:{zh:'醬汁（擇一）',en:'Sauce (choose one)',ja:'ソース（1つ）'}, choices:[
   {id:'red', zh:'紅醬', en:'Tomato sauce', ja:'トマトソース', price:0},
-  {id:'pesto', zh:'青醬', en:'Pesto', ja:'バジルペースト', price:0},
+  {id:'pesto', zh:'青醬（含花生）', en:'Pesto (contains peanuts)', ja:'バジルペースト（ピーナッツ含む）', price:0},
   {id:'white', zh:'白醬', en:'Cream sauce', ja:'クリームソース', price:0},
   {id:'dry', zh:'清炒', en:'Dry-fried (no sauce)', ja:'オイル炒め（ソースなし）', price:0},
 ]};
